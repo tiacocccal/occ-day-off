@@ -1,1 +1,3 @@
-﻿self.addEventListener('fetch', function(event) { /* 靜態代管，移除衝突快取 */ });
+self.addEventListener('fetch', function(event) {
+  // 保持靜態代理，不攔截造成白畫面衝突
+});
