@@ -1,0 +1,1 @@
+﻿self.addEventListener('fetch', function(event) { /* 靜態代管，移除衝突快取 */ });
