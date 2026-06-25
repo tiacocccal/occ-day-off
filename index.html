@@ -2,47 +2,58 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OCC 休假系統</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
   <style>
-    body { background: #F8FBFB; display: flex; align-items: center; justify-content: center; height: 100vh; }
-    .card { width: 100%; max-width: 400px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+    body { background: #f8fbfb; height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .card { width: 90%; max-width: 400px; padding: 30px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
+    .spinner-overlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,255,255,0.8); z-index:9999; display:none; align-items:center; justify-content:center; }
   </style>
 </head>
 <body>
 
-<div class="card">
+<div id="loading-spinner" class="spinner-overlay"><div class="spinner-border text-primary"></div></div>
+
+<div class="card" id="login-card">
   <h4 class="text-center mb-4">系統登入</h4>
-  <input type="text" id="acc" class="form-control mb-3" placeholder="請輸入帳號">
-  <input type="password" id="pass" class="form-control mb-3" placeholder="請輸入密碼">
-  <button class="btn btn-primary w-100" onclick="login()">登入</button>
+  <input type="text" id="login-account" class="form-control mb-3" placeholder="請輸入人資帳號">
+  <input type="password" id="login-password" class="form-control mb-3" placeholder="請輸入密碼">
+  <button class="btn btn-primary w-100" onclick="handleLogin()">登入</button>
 </div>
 
 <script>
-  // 請務必確認這串網址是剛剛重新部署產生的，且設定為「所有人」存取
-  const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbxxSW7rqqjgMuutJepuCjHApXSqDPPlMutHk6WGiu_2YAHWQHPKer8MawCnPkBz_3i7hg/exec";
+  // 【請務必填入你最新的 GAS 部署網址】
+  const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbzndhMhfOvu3tTx_X-vHLma8gu8H0YkkZBjBJJetJEFD1NRXFDezG8QvuWjdM3PVVSeew/exec";
 
-  function login() {
-    const acc = document.getElementById('acc').value.trim();
-    const pass = document.getElementById('pass').value.trim();
+  function showLoading(show) { document.getElementById('loading-spinner').style.display = show ? 'flex' : 'none'; }
+
+  function handleLogin() {
+    const acc = document.getElementById('login-account').value.trim();
+    const pass = document.getElementById('login-password').value.trim();
     
     if(!acc || !pass) { alert('請填寫帳號密碼'); return; }
 
-    const formData = new URLSearchParams();
-    formData.append('action', 'login');
-    formData.append('account', acc);
-    formData.append('password', pass);
+    showLoading(true);
 
     fetch(GOOGLE_SHEET_API, {
       method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: formData.toString()
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: 'login', account: acc, password: pass })
     })
-    .then(() => {
-      alert("連線成功！(POST請求已送出)");
+    .then(res => res.json())
+    .then(data => {
+      showLoading(false);
+      if (data.status === 'success') {
+        alert("歡迎回來，" + data.name);
+        // 登入成功後，你可以將 body 內容替換為你的主程式介面
+        document.body.innerHTML = `<div class="container text-center pt-5"><h3>登入成功！</h3><p>歡迎使用者：${data.name}</p></div>`;
+      } else {
+        alert("登入失敗：" + data.message);
+      }
     })
     .catch(err => {
+      showLoading(false);
       alert("連線失敗，請檢查網址或權限: " + err);
     });
   }
