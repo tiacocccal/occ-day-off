@@ -1,62 +1,40 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OCC 休假系統</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
-  <style>
-    body { background: #f8fbfb; height: 100vh; display: flex; align-items: center; justify-content: center; }
-    .card { width: 90%; max-width: 400px; padding: 30px; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.08); }
-    .spinner-overlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,255,255,0.8); z-index:9999; display:none; align-items:center; justify-content:center; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OCC 休假系統</title>
 </head>
 <body>
+    <div id="app">
+        <h4>系統登入</h4>
+        <input type="text" id="acc" placeholder="帳號"><br>
+        <input type="password" id="pass" placeholder="密碼"><br>
+        <button onclick="login()">登入</button>
+    </div>
 
-<div id="loading-spinner" class="spinner-overlay"><div class="spinner-border text-primary"></div></div>
+    <script>
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyrBFYdiCWhRR_cbvE_-gy2ocaPhEcr5x3lWfDga0SoYrBw4KmfiXvzJz9vZ6-YmRulKg/exec"; // <--- 務必貼上最新的網址
 
-<div class="card" id="login-card">
-  <h4 class="text-center mb-4">系統登入</h4>
-  <input type="text" id="login-account" class="form-control mb-3" placeholder="請輸入人資帳號">
-  <input type="password" id="login-password" class="form-control mb-3" placeholder="請輸入密碼">
-  <button class="btn btn-primary w-100" onclick="handleLogin()">登入</button>
-</div>
+        function login() {
+            const acc = document.getElementById('acc').value;
+            const pass = document.getElementById('pass').value;
 
-<script>
-  // 【請務必填入你最新的 GAS 部署網址】
-  const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbzndhMhfOvu3tTx_X-vHLma8gu8H0YkkZBjBJJetJEFD1NRXFDezG8QvuWjdM3PVVSeew/exec";
-
-  function showLoading(show) { document.getElementById('loading-spinner').style.display = show ? 'flex' : 'none'; }
-
-  function handleLogin() {
-    const acc = document.getElementById('login-account').value.trim();
-    const pass = document.getElementById('login-password').value.trim();
-    
-    if(!acc || !pass) { alert('請填寫帳號密碼'); return; }
-
-    showLoading(true);
-
-    fetch(GOOGLE_SHEET_API, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ action: 'login', account: acc, password: pass })
-    })
-    .then(res => res.json())
-    .then(data => {
-      showLoading(false);
-      if (data.status === 'success') {
-        alert("歡迎回來，" + data.name);
-        // 登入成功後，你可以將 body 內容替換為你的主程式介面
-        document.body.innerHTML = `<div class="container text-center pt-5"><h3>登入成功！</h3><p>歡迎使用者：${data.name}</p></div>`;
-      } else {
-        alert("登入失敗：" + data.message);
-      }
-    })
-    .catch(err => {
-      showLoading(false);
-      alert("連線失敗，請檢查網址或權限: " + err);
-    });
-  }
-</script>
+            fetch(GAS_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ action: "login", account: acc, password: pass })
+            })
+            .then(res => res.json())
+            .then(data => {
+                if(data.status === "success") {
+                    document.getElementById('app').innerHTML = "<h1>登入成功！歡迎 " + data.name + "</h1>";
+                } else {
+                    alert("帳號或密碼錯誤");
+                }
+            })
+            .catch(err => alert("連線錯誤，請確認網址是否已更新為新版本"));
+        }
+    </script>
 </body>
 </html>
