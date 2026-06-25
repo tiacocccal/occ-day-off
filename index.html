@@ -5,11 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>OCC 休假表</title>
   
-  <!-- 外部套件 -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <link rel="manifest" href="manifest.json?v=3">
+  <link rel="manifest" href="manifest.json?v=4">
 
   <style>
     :root {
@@ -23,8 +22,9 @@
       background-color: var(--pantone-light-bg);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       margin: 0;
-      padding-bottom: 75px;
+      padding-bottom: 80px;
       user-select: none;
+      overflow-x: hidden;
     }
 
     .occ-navbar {
@@ -66,10 +66,11 @@
     }
     .footer-item i { font-size: 20px; margin-bottom: 3px; }
 
-    /* 圖2 滿版高質感月曆圓弧方格樣式 */
+    /* 滿版月曆切換 */
     .fc {
       --fc-border-color: transparent !important; 
       --fc-page-bg-color: transparent !important;
+      width: 100% !important;
     }
     .fc-theme-standard th {
       border: none !important;
@@ -79,33 +80,95 @@
     .fc-daygrid-day-frame {
       background: white !important;
       border-radius: 12px !important;
-      margin: 3px !important;
+      margin: 2px !important;
       box-shadow: 0 4px 10px rgba(17, 75, 95, 0.04);
-      min-height: 70px !important;
+      min-height: 75px !important;
     }
     .fc-daygrid-day-number {
       color: #333 !important;
       text-decoration: none !important;
       font-weight: bold;
-      padding: 6px !important;
+      padding: 4px 6px !important;
     }
     .fc-col-header-cell-cushion {
       text-decoration: none !important;
       color: var(--pantone-navy) !important;
     }
-    .fc-view-harness { margin: 0 -12px; }
-    .fc-toolbar-title { font-size: 18px !important; color: var(--pantone-navy); font-weight: bold; }
-    .fc-button-primary { background-color: var(--pantone-dark-sea) !important; border: none !important; }
+    /* 修正按鈕自訂佈局樣式 */
+    .fc-toolbar {
+      display: flex !important;
+      justify-content: space-between !important;
+      align-items: center !important;
+      padding: 0 4px !important;
+      margin-bottom: 15px !important;
+    }
+    .fc-toolbar-chunk {
+      display: flex !important;
+      align-items: center !important;
+      gap: 8px;
+    }
+    .fc-toolbar-title { 
+      font-size: 18px !important; 
+      color: var(--pantone-navy); 
+      font-weight: bold;
+      margin: 0 5px !important;
+    }
+    .fc-button-primary { 
+      background-color: var(--pantone-dark-sea) !important; 
+      border: none !important; 
+      padding: 6px 12px !important;
+      border-radius: 8px !important;
+    }
 
     .toggle-group { display: flex; background: #e4ecec; border-radius: 12px; padding: 4px; }
     .toggle-btn { flex: 1; border: none; background: none; padding: 8px; font-weight: bold; color: #666; border-radius: 10px; }
     .toggle-btn.active { background: white; color: var(--pantone-navy); box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
 
-    .ios-picker-container { display: flex; justify-content: center; background: #f0f0f0; border-radius: 16px; padding: 10px; overflow: hidden; }
-    .ios-picker-col { height: 105px; overflow-y: scroll; scroll-snap-type: y mandatory; width: 50px; text-align: center; }
+    /* 優化後的 iOS 滾輪樣式 */
+    .ios-picker-container { 
+      display: flex; 
+      justify-content: center; 
+      background: #f0f7f7; 
+      border-radius: 16px; 
+      padding: 15px 10px; 
+      position: relative;
+    }
+    /* 滾輪選中遮罩高亮藍底 */
+    .ios-picker-container::before {
+      content: "";
+      position: absolute;
+      left: 10px; right: 10px; top: 50%;
+      transform: translateY(-50%);
+      height: 36px;
+      background: rgba(2, 128, 144, 0.08);
+      border-top: 1px solid rgba(2, 128, 144, 0.2);
+      border-bottom: 1px solid rgba(2, 128, 144, 0.2);
+      border-radius: 8px;
+      pointer-events: none;
+    }
+    .ios-picker-col { 
+      height: 108px; 
+      overflow-y: scroll; 
+      scroll-snap-type: y mandatory; 
+      width: 65px; 
+      text-align: center; 
+      scrollbar-width: none;
+    }
     .ios-picker-col::-webkit-scrollbar { display: none; }
-    .ios-picker-item { height: 35px; line-height: 35px; scroll-snap-align: start; font-size: 18px; color: #bbb; }
-    .ios-picker-item.selected { color: #000; font-weight: bold; }
+    .ios-picker-item { 
+      height: 36px; 
+      line-height: 36px; 
+      scroll-snap-align: center; 
+      font-size: 16px; 
+      color: #a0b0b0; 
+      transition: all 0.2s ease;
+    }
+    /* 確保選中項目絕對變黑粗體 */
+    .ios-picker-item.selected { 
+      color: #114B5F !important; 
+      font-weight: 800 !important; 
+      font-size: 18px !important;
+    }
 
     .card-custom { background: white; border-radius: 24px; box-shadow: 0 8px 24px rgba(11, 75, 95, 0.08); border: none; padding: 20px; margin-bottom: 16px; }
     .app-section { display: none; }
@@ -114,27 +177,22 @@
 </head>
 <body>
 
-  <!-- 1. 登入畫面 -->
   <div id="section-login" class="container py-5" style="max-width: 420px; display: none;">
     <div class="card-custom text-center mt-5">
       <h3 class="mb-4" style="color: var(--pantone-navy); font-weight: 700;">OCC 休假管理系統</h3>
       <div class="mb-3 text-start">
         <label class="form-label text-secondary small">帳號</label>
-        <input type="text" id="login-account" class="form-control" placeholder="請輸入帳號" style="border-radius:12px;">
+        <input type="text" id="login-account" class="form-control" placeholder="請輸入姓名或帳號" style="border-radius:12px;">
       </div>
       <div class="mb-3 text-start position-relative">
         <label class="form-label text-secondary small">密碼</label>
         <input type="password" id="login-password" class="form-control" placeholder="請輸入密碼" style="border-radius:12px; padding-right: 40px;">
         <i class="fa-solid fa-eye position-absolute" id="eye-icon" style="right: 15px; top: 38px; cursor: pointer; color: #aaa;" onclick="togglePassword()"></i>
       </div>
-      <div class="text-end mb-4">
-        <a href="#" onclick="alert('請洽管理員窗口重設')" style="color: var(--pantone-dark-sea); font-size: 13px; text-decoration: none;">忘記密碼？</a>
-      </div>
       <button class="btn w-100 py-2" style="background-color: var(--pantone-dark-sea); color:white; border-radius:12px; font-weight: bold;" onclick="handleLogin()">登入</button>
     </div>
   </div>
 
-  <!-- 2. 主系統介面 -->
   <div id="main-application" style="display: none;">
     <div class="occ-navbar">
       <div>
@@ -142,59 +200,55 @@
         <span style="font-weight: bold; font-size: 16px;">OCC休假表</span>
       </div>
       <div style="font-size: 13px;">
-        <span id="user-greeting" class="me-2" style="font-weight: 600;">HELLO</span>
-        <button class="btn btn-sm btn-outline-light px-2 py-0 me-1" style="font-size:11px;" onclick="changePassword()">修改密碼</button>
+        <span id="user-greeting" class="me-2" style="font-weight: 600;">HELLO 同仁</span>
         <button class="btn btn-sm btn-light text-danger px-2 py-0" style="font-size:11px; font-weight:bold;" onclick="handleLogout()">登出</button>
       </div>
     </div>
 
-    <div class="container pt-3">
-      <!-- A. 首頁 (月曆滿版模式) -->
+    <div class="container-fluid px-3 pt-3">
+      
       <div id="sect-home" class="app-section active">
         <div id="calendar"></div>
       </div>
 
-      <!-- B. 預定請假 -->
       <div id="sect-reserve" class="app-section">
         <div class="card-custom">
           <h5 class="mb-4" style="color:var(--pantone-navy); font-weight:700;"><i class="fa-solid fa-calendar-check me-2"></i>填寫請假申請</h5>
           <div class="row g-2 mb-3">
             <div class="col-6">
-              <label class="form-label small text-secondary">開始日期</label>
-              <input type="date" id="leave-start-date" class="form-control" style="border-radius:10px;">
+              <label class="form-label small text-secondary">請假日期</label>
+              <input type="date" id="leave-start-date" class="form-control" style="border-radius:10px;" onchange="handleDateAutoSelect()">
             </div>
             <div class="col-6">
-              <label class="form-label small text-secondary">結束日期</label>
-              <input type="date" id="leave-end-date" class="form-control" style="border-radius:10px;">
+              <label class="form-label small text-secondary">請假類型</label>
+              <div class="toggle-group">
+                <button class="toggle-btn active" id="btn-time-full" onclick="setLeaveType('full')">整天</button>
+                <button class="toggle-btn" id="btn-time-custom" onclick="setLeaveType('custom')">特殊時段</button>
+              </div>
             </div>
           </div>
-          <div class="mb-3">
-            <label class="form-label small text-secondary">請假類型</label>
-            <div class="toggle-group">
-              <button class="toggle-btn active" id="btn-time-full" onclick="setLeaveType('full')">整天</button>
-              <button class="toggle-btn" id="btn-time-custom" onclick="setLeaveType('custom')">特殊時段</button>
-            </div>
-          </div>
+          
           <div id="ios-time-picker-block" class="mb-3" style="display:none;">
+            <label class="form-label small text-secondary d-block text-center mb-2">設定時間範圍</label>
             <div class="ios-picker-container">
               <div class="ios-picker-col" id="picker-sh"></div>
-              <div class="ios-picker-item">:</div>
+              <div class="ios-picker-item" style="color:var(--pantone-navy); font-weight:bold;">:</div>
               <div class="ios-picker-col" id="picker-sm"></div>
-              <div class="mx-3 align-self-center text-muted">至</div>
+              <div class="mx-2 align-self-center text-muted fw-bold">至</div>
               <div class="ios-picker-col" id="picker-eh"></div>
-              <div class="ios-picker-item">:</div>
+              <div class="ios-picker-item" style="color:var(--pantone-navy); font-weight:bold;">:</div>
               <div class="ios-picker-col" id="picker-em"></div>
             </div>
           </div>
+
           <div class="mb-4">
-            <label class="form-label small text-secondary">備註</label>
+            <label class="form-label small text-secondary">備註事由</label>
             <textarea id="leave-memo" class="form-control" rows="3" style="border-radius:10px;" placeholder="請輸入備註..."></textarea>
           </div>
           <button class="btn w-100 py-2" style="background-color: var(--pantone-turquoise); color:white; border-radius:12px; font-weight:bold;" onclick="submitLeave()">送出預定</button>
         </div>
       </div>
 
-      <!-- C. 行程管理 -->
       <div id="sect-mytrips" class="app-section">
         <div class="card-custom">
           <h5 class="mb-3" style="color:var(--pantone-navy); font-weight:700;"><i class="fa-solid fa-clock-rotate-left me-2"></i>我的請假清單</h5>
@@ -202,23 +256,38 @@
         </div>
       </div>
 
-      <!-- D. 單位總覽 -->
       <div id="sect-overview" class="app-section">
         <div class="card-custom">
-          <div class="d-flex justify-content-between gap-1 mb-3">
-            <button class="btn btn-sm btn-outline-secondary w-25" onclick="loadOverviewData('day')">當日</button>
-            <button class="btn btn-sm btn-outline-secondary w-25" onclick="loadOverviewData('month')">當月</button>
-            <button class="btn btn-sm btn-outline-secondary w-25" onclick="promptMonthSelect()">選擇月份</button>
-            <button class="btn btn-sm btn-outline-secondary w-25" onclick="promptUserSelect()">選擇人員</button>
+          <h5 class="mb-3" style="color:var(--pantone-navy); font-weight:700;"><i class="fa-solid fa-users-viewfinder me-2"></i>多功能篩選總覽</h5>
+          
+          <div class="p-3 mb-3" style="background: #f0f7f7; border-radius:16px;">
+            <div class="row g-2">
+              <div class="col-6">
+                <label class="small text-secondary mb-1 d-block text-center">選擇月份滾輪</label>
+                <div class="ios-picker-container" style="padding: 5px;">
+                  <div class="ios-picker-col" id="picker-overview-month" style="width:90px;"></div>
+                </div>
+              </div>
+              <div class="col-6">
+                <label class="small text-secondary mb-1 d-block text-center">選擇人員滾輪</label>
+                <div class="ios-picker-container" style="padding: 5px;">
+                  <div class="ios-picker-col" id="picker-overview-user" style="width:90px;"></div>
+                </div>
+              </div>
+            </div>
+            <div class="d-flex gap-2 mt-3">
+              <button class="btn btn-sm btn-primary flex-fill" style="background: var(--pantone-dark-sea);" onclick="executeWheelFilter('month')">按月份查詢</button>
+              <button class="btn btn-sm btn-primary flex-fill" style="background: var(--pantone-navy);" onclick="executeWheelFilter('user')">按人員查詢</button>
+            </div>
           </div>
+
           <div id="all-leaves-list">
-            <p class="text-muted text-center py-3 small">請選擇上方篩選功能查看清單</p>
+            <p class="text-muted text-center py-3 small">請滑動上方滾輪並點擊查詢按鈕</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 下方固定功能列 -->
     <div class="occ-footer">
       <button class="footer-item active" onclick="switchTab('home', this)">
         <i class="fa-solid fa-house"></i>首頁
@@ -235,7 +304,6 @@
     </div>
   </div>
 
-  <!-- 當天請假彈出視窗 -->
   <div class="modal fade" id="dayDetailModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered mx-3">
       <div class="modal-content" style="border-radius: 24px; border:none;">
@@ -256,24 +324,18 @@
     let currentUser = null;
     let selectedLeaveType = 'full';
 
-    const mockDb = [
-      { name: "如蘭", date: "2026-06-24", type: "整天", memo: "特休" },
-      { name: "微儀", date: "2026-06-24", type: "13:00 - 17:00", memo: "事假" },
-      { name: "怡君", date: "2026-07-10", type: "整天", memo: "婚假" },
-      { name: "宗翰", date: "2026-07-15", type: "08:00 - 12:00", memo: "病假" }
-    ];
+    // 乾淨的初始狀態資料庫（無假資料打擾）
+    const mockDb = [];
 
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js').then(reg => { reg.update(); });
-    }
+    // 人員名單庫
+    const userList = ["如蘭", "微儀", "怡君", "宗翰", "家豪", "雅婷"];
+    const monthList = ["2026-05", "2026-06", "2026-07", "2026-08", "2026-09"];
 
-    // 立即初始化，不等待加載
-    initApp();
-
-    function initApp() {
+    window.onload = function() {
       checkLoginState();
       buildIosPickers();
-    }
+      buildFilterPickers();
+    };
 
     function togglePassword() {
       const pInput = document.getElementById('login-password');
@@ -299,14 +361,14 @@
 
     function handleLogin() {
       const acc = document.getElementById('login-account').value.trim();
-      if(!acc) { alert('請填寫帳號'); return; }
-      currentUser = { account: acc, name: "同仁" }; 
+      if(!acc) { alert('請填寫姓名/帳號'); return; }
+      // 確實將名字綁入系統內
+      currentUser = { account: acc, name: acc }; 
       localStorage.setItem('occ_user', JSON.stringify(currentUser));
       showMainApp();
     }
 
     function handleLogout() { localStorage.clear(); window.location.reload(); }
-    function changePassword() { alert("功能已開啟"); }
 
     function showMainApp() {
       document.getElementById('section-login').style.display = 'none';
@@ -330,7 +392,12 @@
       calendar = new FullCalendar.Calendar(calEl, {
         initialView: 'dayGridMonth',
         locale: 'zh-tw',
-        headerToolbar: { left: 'prev,next today', center: 'title', right: '' },
+        height: 'auto', // 移除滾輪限制，讓月曆滿版完整延伸
+        headerToolbar: { 
+          left: 'prev,title,next', // 左右切換包在標題兩側
+          center: '', 
+          right: 'today' // 今天放到最右側
+        },
         dateClick: function(info) {
           const list = mockDb.filter(d => d.date === info.dateStr);
           document.getElementById('modal-date-title').innerText = `${info.dateStr} 休假人員`;
@@ -349,39 +416,125 @@
       calendar.render();
     }
 
+    // 日期選好以後自動處理跳轉/縮回
+    function handleDateAutoSelect() {
+      const dateVal = document.getElementById('leave-start-date').value;
+      if(dateVal) {
+        // 自動聚焦到下一個備註欄位或完成初步選取提示
+        document.getElementById('leave-memo').focus();
+      }
+    }
+
     function setLeaveType(type) {
       selectedLeaveType = type;
       document.getElementById('btn-time-full').classList.toggle('active', type === 'full');
       document.getElementById('btn-time-custom').classList.toggle('active', type === 'custom');
       document.getElementById('ios-time-picker-block').style.display = (type === 'custom') ? 'block' : 'none';
+      if(type === 'custom') {
+        setTimeout(() => { updateWheelSelectionAll(); }, 50);
+      }
     }
 
-    function loadOverviewData(mode, param = "") {
+    // 建立與監聽高質感滾輪機制
+    function buildIosPickers() {
+      const fill = (id, max) => {
+        const el = document.getElementById(id); if(!el) return;
+        el.innerHTML = "";
+        // 前後補空項目確保置中
+        el.appendChild(createEmptyItem());
+        for(let i=0; i<max; i++) {
+          let v = i < 10 ? '0'+i : ''+i;
+          let item = document.createElement('div');
+          item.className = 'ios-picker-item'; item.innerText = v;
+          el.appendChild(item);
+        }
+        el.appendChild(createEmptyItem());
+        setupScrollListener(el);
+      };
+      fill('picker-sh', 24); fill('picker-sm', 60); fill('picker-eh', 24); fill('picker-em', 60);
+    }
+
+    function buildFilterPickers() {
+      const fillArray = (id, arr) => {
+        const el = document.getElementById(id); if(!el) return;
+        el.innerHTML = "";
+        el.appendChild(createEmptyItem());
+        arr.forEach(val => {
+          let item = document.createElement('div');
+          item.className = 'ios-picker-item'; item.innerText = val;
+          el.appendChild(item);
+        });
+        el.appendChild(createEmptyItem());
+        setupScrollListener(el);
+      };
+      fillArray('picker-overview-month', monthList);
+      fillArray('picker-overview-user', userList);
+    }
+
+    function createEmptyItem() {
+      let item = document.createElement('div');
+      item.className = 'ios-picker-item'; item.style.visibility = 'hidden';
+      return item;
+    }
+
+    function setupScrollListener(el) {
+      el.addEventListener('scroll', () => {
+        clearTimeout(el.scrollTimeout);
+        el.scrollTimeout = setTimeout(() => {
+          const scrollTop = el.scrollTop;
+          const itemHeight = 36;
+          const index = Math.round(scrollTop / itemHeight) + 1; // 修正置中索引
+          
+          // 清除同層舊樣式
+          Array.from(el.children).forEach(c => c.classList.remove('selected'));
+          
+          if(el.children[index] && !el.children[index].style.visibility) {
+            el.children[index].classList.add('selected');
+          }
+        }, 80);
+      });
+      // 初始預設第一個選中
+      setTimeout(() => {
+        if(el.children[1]) el.children[1].classList.add('selected');
+      }, 200);
+    }
+
+    function updateWheelSelectionAll() {
+      document.querySelectorAll('.ios-picker-col').forEach(el => {
+        const scrollTop = el.scrollTop;
+        const index = Math.round(scrollTop / 36) + 1;
+        Array.from(el.children).forEach(c => c.classList.remove('selected'));
+        if(el.children[index]) el.children[index].classList.add('selected');
+      });
+    }
+
+    function getWheelValue(id) {
+      const el = document.getElementById(id);
+      const active = el.querySelector('.ios-picker-item.selected');
+      return active ? active.innerText : "00";
+    }
+
+    // 執行滾輪篩選
+    function executeWheelFilter(mode) {
       const container = document.getElementById('all-leaves-list');
-      const todayStr = "2026-06-24"; 
-      const thisMonthStr = "2026-06"; 
       let filtered = [];
 
-      if(mode === 'day') {
-        filtered = mockDb.filter(d => d.date === todayStr);
-        container.innerHTML = `<h6 class='text-secondary mb-2'>今日 (${todayStr}) 請假清單：</h6>`;
-      } else if (mode === 'month') {
-        filtered = mockDb.filter(d => d.date.startsWith(thisMonthStr));
-        container.innerHTML = `<h6 class='text-secondary mb-2'>本月 (${thisMonthStr}) 請假清單：</h6>`;
-      } else if (mode === 'sel-month') {
-        filtered = mockDb.filter(d => d.date.startsWith(param));
-        container.innerHTML = `<h6 class='text-secondary mb-2'>月份 (${param}) 篩選結果：</h6>`;
-      } else if (mode === 'sel-user') {
-        filtered = mockDb.filter(d => d.name === param);
-        container.innerHTML = `<h6 class='text-secondary mb-2'>同仁 (${param}) 的所有請假：</h6>`;
+      if(mode === 'month') {
+        const targetMonth = getWheelValue('picker-overview-month');
+        filtered = mockDb.filter(d => d.date.startsWith(targetMonth));
+        container.innerHTML = `<h6 class='text-secondary mb-2'>月份 (${targetMonth}) 滾輪篩選結果：</h6>`;
+      } else {
+        const targetUser = getWheelValue('picker-overview-user');
+        filtered = mockDb.filter(d => d.name === targetUser);
+        container.innerHTML = `<h6 class='text-secondary mb-2'>同仁 (${targetUser}) 滾輪篩選結果：</h6>`;
       }
 
       if(filtered.length === 0) {
-        container.innerHTML += `<p class='text-muted py-3 text-center'>無符合條件的請假紀錄</p>`;
+        container.innerHTML += `<p class='text-muted py-3 text-center'>查無符合的請假紀錄</p>`;
       } else {
         filtered.forEach(x => {
           container.innerHTML += `
-            <div class='p-2 mb-2 border-bottom d-flex justify-content-between align-items-center' style='background: #fff; border-radius:10px;'>
+            <div class='p-3 mb-2 border-bottom d-flex justify-content-between align-items-center' style='background: #fff; border-radius:12px;'>
               <div><strong>${x.name}</strong> <small class='text-muted'>(${x.date})</small></div>
               <span class='badge bg-info text-dark'>${x.type}</span>
             </div>`;
@@ -389,46 +542,57 @@
       }
     }
 
-    function promptMonthSelect() {
-      const m = prompt("請輸入欲查詢的月份 (格式如: 2026-06 或 2026-07):", "2026-06");
-      if(m) loadOverviewData('sel-month', m);
-    }
-
-    function promptUserSelect() {
-      const u = prompt("請輸入欲查詢的同仁姓名 (例如: 如蘭、微儀、怡君):", "如蘭");
-      if(u) loadOverviewData('sel-user', u);
-    }
-
-    function buildIosPickers() {
-      const fill = (id, max) => {
-        const el = document.getElementById(id); if(!el) return;
-        el.innerHTML = "";
-        for(let i=0; i<max; i++) {
-          let v = i < 10 ? '0'+i : ''+i;
-          let item = document.createElement('div');
-          item.className = 'ios-picker-item'; item.innerText = v;
-          el.appendChild(item);
-        }
-        if(el.children[0]) el.children[0].classList.add('selected');
-      };
-      fill('picker-sh', 24); fill('picker-sm', 60); fill('picker-eh', 24); fill('picker-em', 60);
-    }
-
     function submitLeave() {
-      alert("請假送出成功！");
+      const dateVal = document.getElementById('leave-start-date').value;
+      const memoVal = document.getElementById('leave-memo').value.trim();
+      if(!dateVal) { alert('請選取請假日期'); return; }
+
+      let finalType = "整天";
+      if(selectedLeaveType === 'custom') {
+        finalType = `${getWheelValue('picker-sh')}:${getWheelValue('picker-sm')} - ${getWheelValue('picker-eh')}:${getWheelValue('picker-em')}`;
+      }
+
+      // 將當前登入者名字塞入假單
+      mockDb.push({
+        name: currentUser.name,
+        date: dateVal,
+        type: finalType,
+        memo: memoVal || "無備註"
+      });
+
+      alert("請假預定成功！");
+      document.getElementById('leave-start-date').value = "";
+      document.getElementById('leave-memo').value = "";
       switchTab('home', document.querySelectorAll('.footer-item')[0]);
     }
 
     function renderMyTrips() {
       const container = document.getElementById('my-leaves-list');
-      container.innerHTML = `
+      // 確保完全動態抓取登入者名字
+      const myLeaves = mockDb.filter(d => d.name === currentUser.name);
+      
+      if(myLeaves.length === 0) {
+        container.innerHTML = `<p class='text-muted text-center py-3 small'>您目前沒有任何請假預定</p>`;
+        return;
+      }
+
+      let html = "";
+      myLeaves.forEach((x, index) => {
+        html += `
         <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
-          <div><strong>${currentUser.name}</strong> <span class="text-muted small">2026-07-10</span><br><small class="text-secondary">時段: 整天</small></div>
+          <div><strong>${x.name}</strong> <span class="text-muted small">${x.date}</span><br><small class="text-secondary">時段: ${x.type} (${x.memo})</small></div>
           <div>
-            <button class="btn btn-sm btn-outline-secondary me-1" onclick="switchTab('reserve', document.querySelectorAll('.footer-item')[1])"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn btn-sm btn-outline-danger" onclick="this.parentElement.parentElement.remove()"><i class="fa-solid fa-trash"></i></button>
+            <button class="btn btn-sm btn-outline-danger" onclick="removeLeave(${index})"><i class="fa-solid fa-trash"></i></button>
           </div>
         </div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function removeLeave(index) {
+      mockDb.splice(index, 1);
+      renderMyTrips();
+      if(calendar) calendar.render();
     }
   </script>
 </body>
