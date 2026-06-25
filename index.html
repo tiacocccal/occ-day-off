@@ -1,39 +1,32 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>OCC 休假系統</title>
-</head>
 <body>
-    <div id="app">
-        <h4>系統登入</h4>
-        <input type="text" id="acc" placeholder="帳號"><br>
-        <input type="password" id="pass" placeholder="密碼"><br>
-        <button onclick="login()">登入</button>
-    </div>
+    <h3>OCC 系統登入</h3>
+    <input type="text" id="acc" placeholder="帳號"><br>
+    <input type="password" id="pass" placeholder="密碼"><br>
+    <button onclick="login()">點我登入</button>
 
     <script>
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbyrBFYdiCWhRR_cbvE_-gy2ocaPhEcr5x3lWfDga0SoYrBw4KmfiXvzJz9vZ6-YmRulKg/exec"; // <--- 務必貼上最新的網址
+        // 把下面這行換成你最新部署的網址，確保前後沒有空格
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbwNTSDQciYQOdRwH4mIx52UncsIdssSQ0dH2cdO8dmaYQxRX9viSP7zu5uvQSa5LEzxAg/exec"; 
 
         function login() {
-            const acc = document.getElementById('acc').value;
-            const pass = document.getElementById('pass').value;
-
             fetch(GAS_URL, {
                 method: "POST",
+                mode: "cors", // 確保使用 cors 模式
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ action: "login", account: acc, password: pass })
+                body: JSON.stringify({ 
+                    action: "login", 
+                    account: document.getElementById('acc').value, 
+                    password: document.getElementById('pass').value 
+                })
             })
             .then(res => res.json())
             .then(data => {
-                if(data.status === "success") {
-                    document.getElementById('app').innerHTML = "<h1>登入成功！歡迎 " + data.name + "</h1>";
-                } else {
-                    alert("帳號或密碼錯誤");
-                }
+                if(data.status === "success") alert("登入成功，歡迎 " + data.name);
+                else alert("帳密錯誤");
             })
-            .catch(err => alert("連線錯誤，請確認網址是否已更新為新版本"));
+            .catch(err => alert("錯誤: " + err));
         }
     </script>
 </body>
