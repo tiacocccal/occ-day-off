@@ -6,7 +6,7 @@
   <title>OCC 休假表</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   <style>
     :root {
       --pantone-turquoise: #00A896;  
@@ -33,7 +33,6 @@
       box-shadow: 0 10px 30px rgba(17, 75, 95, 0.08);
       padding: 40px 30px; width: 100%; max-width: 400px; text-align: center;
     }
-    /* 🎯 放大中央 Logo 區塊樣式 */
     .login-logo-box {
       width: 100%;
       height: 160px;
@@ -49,4 +48,30 @@
       object-fit: contain;
       margin-top: -10px;
     }
-    .
+    .login-btn-gradient {
+      background: linear-gradient(90deg, #79C2E6 0%, #F4BD93 100%);
+      color: white !important; border: none; border-radius: 14px; font-weight: bold; padding: 12px;
+    }
+    .password-wrapper {
+      position: relative;
+    }
+    .password-toggle-icon {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #a0b0b5;
+      z-index: 10;
+    }
+    .occ-navbar { background-color: var(--pantone-navy); color: white; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; }
+    .navbar-brand-box { display: flex; align-items: center; gap: 8px; font-size: 19px; font-weight: bold; }
+    .navbar-brand-box img { height: 32px; max-height: 35px; width: auto; object-fit: contain; }
+    .status-bar { background-color: white; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #EAEAEA; }
+    .user-greeting-box { font-size: 17px; font-weight: 800; color: #028090; }
+    .admin-badge { background-color: #FFEBEB; color: #FF4D4D; font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: bold; margin-left: 6px; display: none; }
+    .occ-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: white; box-shadow: 0 -3px 12px rgba(0,0,0,0.04); display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
+    .footer-item { display: flex; flex-direction: column; align-items: center; color: #8c9ba5; font-size: 11px; background: none; border: none; width: 25%; }
+    .footer-item.active { color: var(--pantone-dark-sea); font-weight: bold; }
+    .footer-item i { font-size: 20px; margin-bottom: 3px; }
+    .calendar-container { padding: 12px; }
