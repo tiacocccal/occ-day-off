@@ -20,11 +20,20 @@
 
     body {
       background-color: var(--pantone-light-bg);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      /* 您可以在此指定字體體系 */
+      font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       margin: 0;
       padding-bottom: 85px;
       user-select: none;
       overflow-x: hidden;
+    }
+
+    /* 登入標題字體樣式指定 */
+    .login-title {
+      color: var(--pantone-navy); 
+      font-weight: 800; 
+      font-size: 26px;
+      letter-spacing: 1px;
     }
 
     .occ-navbar {
@@ -66,7 +75,7 @@
     }
     .footer-item i { font-size: 20px; margin-bottom: 3px; }
 
-    /* 月曆結構優化：全等大格子 */
+    /* 月曆結構優化 */
     .fc {
       width: 100% !important;
       background: white;
@@ -90,7 +99,6 @@
       padding: 6px !important;
       font-size: 14px;
     }
-    /* 月曆上方按鈕包覆與並排 */
     .fc-toolbar {
       display: flex !important;
       flex-direction: row !important;
@@ -98,17 +106,11 @@
       align-items: center !important;
       margin-bottom: 12px !important;
     }
-    .fc-toolbar-chunk {
-      display: flex !important;
-      align-items: center !important;
-      white-space: nowrap !important;
-    }
     .fc-toolbar-title { 
       font-size: 17px !important; 
       color: var(--pantone-navy); 
       font-weight: bold;
       margin: 0 8px !important;
-      display: inline-block !important;
     }
     .fc-button {
       padding: 4px 10px !important;
@@ -120,7 +122,7 @@
       border: none !important; 
     }
 
-    /* 圖6 & 圖7 專屬切換元件及滾輪排版 */
+    /* 切換元件及滾輪排版 */
     .toggle-group { display: flex; background: #e4ecec; border-radius: 12px; padding: 4px; width: 100%; }
     .toggle-btn { flex: 1; border: none; background: none; padding: 8px; font-weight: bold; color: #666; border-radius: 10px; font-size: 14px; }
     .toggle-btn.active { background: white; color: var(--pantone-navy); box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
@@ -144,10 +146,7 @@
       border-radius: 10px;
       white-space: nowrap;
     }
-    .top-filter-btn.active {
-      background: var(--pantone-navy);
-      color: white;
-    }
+    .top-filter-btn.active { background: var(--pantone-navy); color: white; }
 
     /* iOS 高質感滑動滾輪 */
     .ios-picker-container { 
@@ -202,15 +201,18 @@
 
   <div id="section-login" class="container py-5" style="max-width: 420px; display: none;">
     <div class="card-custom text-center mt-5">
-      <h3 class="mb-4" style="color: var(--pantone-navy); font-weight: 700;">OCC 休假管理系統</h3>
+      <h3 class="mb-4 login-title">OCC 休假管理系統</h3>
+      
       <div class="mb-3 text-start">
         <label class="form-label text-secondary small">帳號</label>
         <input type="text" id="login-account" class="form-control" placeholder="請輸入帳號或姓名" style="border-radius:12px;">
       </div>
       <div class="mb-3 text-start position-relative">
         <label class="form-label text-secondary small">密碼</label>
-        <input type="password" id="login-password" class="form-control" placeholder="請輸入密碼" style="border-radius:12px; padding-right: 40px;">
-        <i class="fa-solid fa-eye position-absolute" id="eye-icon" style="right: 15px; top: 38px; cursor: pointer; color: #aaa;" onclick="togglePassword()"></i>
+        <div class="position-relative">
+          <input type="password" id="login-password" class="form-control" placeholder="請輸入密碼" style="border-radius:12px; padding-right: 45px;">
+          <i class="fa-solid fa-eye position-absolute" id="eye-icon" style="right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #aaa; z-index: 10;" onclick="togglePassword()"></i>
+        </div>
       </div>
       <button class="btn w-100 py-2" style="background-color: var(--pantone-dark-sea); color:white; border-radius:12px; font-weight: bold;" onclick="handleLogin()">登入</button>
     </div>
@@ -222,14 +224,14 @@
         <i class="fa-solid fa-plane-departure me-2"></i>
         <span style="font-weight: bold; font-size: 15px;">OCC休假表</span>
       </div>
-      <div style="font-size: 13px;">
-        <span id="user-greeting" class="me-2" style="font-weight: 600;">HELLO 同仁</span>
+      <div style="font-size: 13px; display: flex; align-items: center; gap: 8px;">
+        <span id="user-greeting" style="font-weight: 600;">HELLO 同仁</span>
+        <button class="btn btn-sm btn-outline-light px-2 py-0" style="font-size:11px;" onclick="openChangePasswordModal()">改密碼</button>
         <button class="btn btn-sm btn-light text-danger px-2 py-0" style="font-size:11px; font-weight:bold;" onclick="handleLogout()">登出</button>
       </div>
     </div>
 
     <div class="container-fluid px-3 pt-3">
-      
       <div id="sect-home" class="app-section active">
         <div id="calendar"></div>
       </div>
@@ -286,7 +288,6 @@
       </div>
 
       <div id="sect-overview" class="app-section">
-        
         <div class="top-filter-bar mb-3">
           <button class="top-filter-btn active" id="filter-btn-day" onclick="handleTopFilter('day')">今日</button>
           <button class="top-filter-btn" id="filter-btn-month" onclick="handleTopFilter('month')">當月</button>
@@ -347,8 +348,35 @@
     </div>
   </div>
 
+  <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered mx-3">
+      <div class="modal-content" style="border-radius: 24px; border:none;">
+        <div class="modal-header" style="background-color: var(--pantone-navy); color: white; border-top-left-radius: 24px; border-top-right-radius: 24px;">
+          <h5 class="modal-title">修改個人密碼</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label small text-secondary">請輸入舊密碼</label>
+            <input type="password" id="pwd-old" class="form-control" style="border-radius:10px;">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small text-secondary">請輸入新密碼</label>
+            <input type="password" id="pwd-new" class="form-control" style="border-radius:10px;">
+          </div>
+          <div class="mb-3">
+            <label class="form-label small text-secondary">再次確認新密碼</label>
+            <input type="password" id="pwd-confirm" class="form-control" style="border-radius:10px;">
+          </div>
+          <button class="btn w-100 text-white py-2 mt-2" style="background-color: var(--pantone-dark-sea); border-radius:12px; font-weight:bold;" onclick="submitChangePassword()">確認變更</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdnjs.cloudflare.com/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
 
   <script>
     let calendar = null;
@@ -356,8 +384,9 @@
     let selectedLeaveType = 'full';
     let currentActiveFilter = 'day';
     let modalSelectedDate = "";
+    let pickersInitialized = false;
 
-    // 帳號對應真實姓名數據庫 (1. 完美修正帳號姓名沒抓對問題)
+    // 帳號姓名對應數據庫
     const userMap = {
       "rulan": "如蘭", "weiyi": "微儀", "yijun": "怡君",
       "zonghan": "宗翰", "jiahao": "家豪", "yating": "雅婷",
@@ -368,17 +397,15 @@
     const userList = ["如蘭", "微儀", "怡君", "宗翰", "家豪", "雅婷"];
     const monthList = ["2026-05", "2026-06", "2026-07", "2026-08", "2026-09"];
 
-    // 休假資料底冊
+    // 初始模擬假資料
     const mockDb = [
       { name: "如蘭", date: "2026-06-25", type: "整天", memo: "特休" },
       { name: "微儀", date: "2026-06-25", type: "13:00 - 17:00", memo: "事假" }
     ];
 
-    window.onload = function() {
+    document.addEventListener("DOMContentLoaded", function() {
       checkLoginState();
-      buildIosPickers();
-      buildFilterPickers();
-    };
+    });
 
     function togglePassword() {
       const pInput = document.getElementById('login-password');
@@ -406,7 +433,6 @@
       const acc = document.getElementById('login-account').value.trim();
       if(!acc) { alert('請填寫帳號或姓名'); return; }
       
-      // 自動轉換成對應真實姓名，查無則保留輸入內容
       const realName = userMap[acc.toLowerCase()] || acc;
       currentUser = { account: acc, name: realName }; 
       localStorage.setItem('occ_user', JSON.stringify(currentUser));
@@ -419,17 +445,37 @@
       document.getElementById('section-login').style.display = 'none';
       document.getElementById('main-application').style.display = 'block';
       document.getElementById('user-greeting').innerText = `HELLO ${currentUser.name}`;
-      setTimeout(() => { initCalendar(); handleTopFilter('day'); }, 60);
+      
+      setTimeout(() => { 
+        initCalendar(); 
+        handleTopFilter('day'); 
+      }, 100);
+    }
+
+    function initLazyPickers() {
+      if (pickersInitialized) return;
+      try {
+        buildIosPickers();
+        buildFilterPickers();
+        pickersInitialized = true;
+      } catch(e) { console.error("滾輪初始化防護攔截:", e); }
     }
 
     function switchTab(targetId, btnEl) {
       document.querySelectorAll('.app-section').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.footer-item').forEach(b => b.classList.remove('active'));
       document.getElementById(`sect-${targetId}`).classList.add('active');
+      
       if(btnEl) btnEl.classList.add('active');
       else {
         const idx = targetId === 'home' ? 0 : targetId === 'reserve' ? 1 : targetId === 'mytrips' ? 2 : 3;
-        document.querySelectorAll('.footer-item')[idx].classList.add('active');
+        if(document.querySelectorAll('.footer-item')[idx]) {
+          document.querySelectorAll('.footer-item')[idx].classList.add('active');
+        }
+      }
+      
+      if(targetId === 'reserve' || targetId === 'overview') {
+        initLazyPickers();
       }
       if(targetId === 'home' && calendar) { calendar.render(); }
       if(targetId === 'mytrips') { renderMyTrips(); }
@@ -438,24 +484,251 @@
     function initCalendar() {
       const calEl = document.getElementById('calendar');
       if (!calEl) return;
+      
       calendar = new FullCalendar.Calendar(calEl, {
         initialView: 'dayGridMonth',
         locale: 'zh-tw',
         height: 'auto',
         headerToolbar: { left: 'prev,title,next', center: '', right: 'today' },
-        
-        // 2. 完美移除「日」字核心過濾
         dayCellDidMount: function(info) {
           const numEl = info.el.querySelector('.fc-daygrid-day-number');
-          if (numEl) {
-            numEl.innerText = numEl.innerText.replace('日', '');
-          }
+          if (numEl) { numEl.innerText = numEl.innerText.replace('日', ''); }
         },
-        
         dateClick: function(info) {
           modalSelectedDate = info.dateStr;
           const list = mockDb.filter(d => d.date === info.dateStr);
           document.getElementById('modal-date-title').innerText = `${info.dateStr} 休假人員`;
           let html = "";
           if(list.length === 0) {
-            html = `<p class='text-muted text-center py
+            html = `<p class='text-muted text-center py-3 m-0'>當天尚無同仁登記請假</p>`;
+          } else {
+            list.forEach(item => {
+              html += `<div class='py-2 border-bottom'><strong>${item.name}</strong> <span class='badge bg-success ms-2'>${item.type}</span><br><small class='text-muted'>備註: ${item.memo}</small></div>`;
+            });
+          }
+          document.getElementById('modal-date-body').innerHTML = html;
+          new bootstrap.Modal(document.getElementById('dayDetailModal')).show();
+        }
+      });
+      calendar.render();
+    }
+
+    function openChangePasswordModal() {
+      new bootstrap.Modal(document.getElementById('changePasswordModal')).show();
+    }
+
+    function submitChangePassword() {
+      const old = document.getElementById('pwd-old').value;
+      const n1 = document.getElementById('pwd-new').value;
+      const n2 = document.getElementById('pwd-confirm').value;
+
+      if(!old || !n1 || !n2) { alert('請完整填寫密碼欄位'); return; }
+      if(n1 !== n2) { alert('兩次輸入的新密碼不一致'); return; }
+
+      alert('密碼修改成功！');
+      const modalEl = document.getElementById('changePasswordModal');
+      const modalInstance = bootstrap.Modal.getInstance(modalEl);
+      if(modalInstance) modalInstance.hide();
+      document.getElementById('pwd-old').value = "";
+      document.getElementById('pwd-new').value = "";
+      document.getElementById('pwd-confirm').value = "";
+    }
+
+    function triggerLeaveFromModal() {
+      const modalEl = document.getElementById('dayDetailModal');
+      const modalInstance = bootstrap.Modal.getInstance(modalEl);
+      if(modalInstance) modalInstance.hide();
+
+      document.getElementById('leave-start-date').value = modalSelectedDate;
+      document.getElementById('leave-end-date').value = modalSelectedDate;
+      switchTab('reserve', null);
+    }
+
+    function setLeaveType(type) {
+      selectedLeaveType = type;
+      document.getElementById('btn-time-full').classList.toggle('active', type === 'full');
+      document.getElementById('btn-time-custom').classList.toggle('active', type === 'custom');
+      document.getElementById('ios-time-picker-block').style.display = (type === 'custom') ? 'block' : 'none';
+      if(type === 'custom') {
+        initLazyPickers();
+        setTimeout(() => { resetWheelActiveStyles(); }, 50);
+      }
+    }
+
+    function handleTopFilter(mode) {
+      currentActiveFilter = mode;
+      document.querySelectorAll('.top-filter-btn').forEach(b => b.classList.remove('active'));
+      if(document.getElementById(`filter-btn-${mode}`)) {
+        document.getElementById(`filter-btn-${mode}`).classList.add('active');
+      }
+
+      const wheelBox = document.getElementById('dynamic-wheel-box');
+      const monthWrap = document.getElementById('wheel-month-wrapper');
+      const userWrap = document.getElementById('wheel-user-wrapper');
+
+      if(mode === 'selmonth' || mode === 'seluser') {
+        initLazyPickers();
+        if(wheelBox) wheelBox.style.display = 'block'; 
+        if(monthWrap) monthWrap.style.display = (mode === 'selmonth') ? 'block' : 'none'; 
+        if(userWrap) userWrap.style.display = (mode === 'seluser') ? 'block' : 'none';
+      } else {
+        if(wheelBox) wheelBox.style.display = 'none';
+        renderOverviewList(mode);
+      }
+    }
+
+    function executeSearchFromWheel() { renderOverviewList(currentActiveFilter); }
+
+    function renderOverviewList(mode) {
+      const container = document.getElementById('all-leaves-list');
+      if (!container) return;
+      const todayStr = "2026-06-25";
+      const thisMonthStr = "2026-06";
+      let filtered = [];
+      let titleHtml = "";
+
+      if(mode === 'day') {
+        filtered = mockDb.filter(d => d.date === todayStr);
+        titleHtml = `<h6 class='text-secondary mb-2'>今日 (${todayStr}) 清單：</h6>`;
+      } else if (mode === 'month') {
+        filtered = mockDb.filter(d => d.date.startsWith(thisMonthStr));
+        titleHtml = `<h6 class='text-secondary mb-2'>本月 (${thisMonthStr}) 清單：</h6>`;
+      } else if (mode === 'selmonth') {
+        const m = getWheelValue('picker-ov-month');
+        filtered = mockDb.filter(d => d.date.startsWith(m));
+        titleHtml = `<h6 class='text-secondary mb-2'>月份 (${m}) 查詢結果：</h6>`;
+      } else if (mode === 'seluser') {
+        const u = getWheelValue('picker-ov-user');
+        filtered = mockDb.filter(d => d.name === u);
+        titleHtml = `<h6 class='text-secondary mb-2'>同仁 (${u}) 查詢結果：</h6>`;
+      }
+
+      if(filtered.length === 0) {
+        container.innerHTML = titleHtml + `<p class='text-muted py-4 text-center small m-0'>無符合條件的請假紀錄</p>`;
+      } else {
+        let html = titleHtml;
+        filtered.forEach(x => {
+          html += `
+            <div class='p-3 mb-2 border-bottom d-flex justify-content-between align-items-center' style='background: #fbfdfd; border-radius:12px;'>
+              <div><strong>${x.name}</strong> <small class='text-muted'>(${x.date})</small><br><span class='text-secondary small'>事由: ${x.memo}</span></div>
+              <span class='badge bg-info text-dark'>${x.type}</span>
+            </div>`;
+        });
+        container.innerHTML = html;
+      }
+    }
+
+    function setupScrollListener(el) {
+      if(!el) return;
+      el.addEventListener('scroll', () => {
+        clearTimeout(el.scrollTimeout);
+        el.scrollTimeout = setTimeout(() => {
+          const scrollTop = el.scrollTop;
+          const index = Math.round(scrollTop / 36) + 1;
+          Array.from(el.children).forEach(c => c.classList.remove('selected'));
+          if(el.children[index] && !el.children[index].style.visibility) {
+            el.children[index].classList.add('selected');
+          }
+        }, 60);
+      });
+      setTimeout(() => { if(el.children[1]) el.children[1].classList.add('selected'); }, 150);
+    }
+
+    function buildIosPickers() {
+      const fill = (id, max) => {
+        const el = document.getElementById(id); if(!el) return;
+        el.innerHTML = ""; el.appendChild(createEmptyItem());
+        for(let i=0; i<max; i++) {
+          let v = i < 10 ? '0'+i : ''+i;
+          let item = document.createElement('div');
+          item.className = 'ios-picker-item'; item.innerText = v; el.appendChild(item);
+        }
+        el.appendChild(createEmptyItem()); setupScrollListener(el);
+      };
+      fill('picker-sh', 24); fill('picker-sm', 60); fill('picker-eh', 24); fill('picker-em', 60);
+    }
+
+    function buildFilterPickers() {
+      const fillArray = (id, arr) => {
+        const el = document.getElementById(id); if(!el) return;
+        el.innerHTML = ""; el.appendChild(createEmptyItem());
+        arr.forEach(val => {
+          let item = document.createElement('div');
+          item.className = 'ios-picker-item'; item.innerText = val; el.appendChild(item);
+        });
+        el.appendChild(createEmptyItem()); setupScrollListener(el);
+      };
+      fillArray('picker-ov-month', monthList);
+      fillArray('picker-ov-user', userList);
+    }
+
+    function createEmptyItem() {
+      let item = document.createElement('div'); item.className = 'ios-picker-item'; item.style.visibility = 'hidden'; return item;
+    }
+
+    function resetWheelActiveStyles() {
+      document.querySelectorAll('.ios-picker-col').forEach(el => {
+        const idx = Math.round(el.scrollTop / 36) + 1;
+        Array.from(el.children).forEach(c => c.classList.remove('selected'));
+        if(el.children[idx]) el.children[idx].classList.add('selected');
+      });
+    }
+
+    function getWheelValue(id) {
+      const el = document.getElementById(id);
+      if(!el) return "00";
+      const active = el.querySelector('.ios-picker-item.selected');
+      return active ? active.innerText : "00";
+    }
+
+    function submitLeave() {
+      const startVal = document.getElementById('leave-start-date').value;
+      const memoVal = document.getElementById('leave-memo').value.trim();
+      if(!startVal) { alert('請選取請假開始日期'); return; }
+
+      let finalType = "整天";
+      if(selectedLeaveType === 'custom') {
+        finalType = `${getWheelValue('picker-sh')}:${getWheelValue('picker-sm')} - ${getWheelValue('picker-eh')}:${getWheelValue('picker-em')}`;
+      }
+
+      mockDb.push({
+        name: currentUser.name,
+        date: startVal,
+        type: finalType,
+        memo: memoVal || "無備註"
+      });
+
+      alert("請假預定成功！");
+      document.getElementById('leave-start-date').value = "";
+      document.getElementById('leave-end-date').value = "";
+      document.getElementById('leave-memo').value = "";
+      
+      if(calendar) calendar.render();
+      handleTopFilter('day');
+      switchTab('home', null);
+    }
+
+    function renderMyTrips() {
+      const container = document.getElementById('my-leaves-list');
+      if(!container) return;
+      const myLeaves = mockDb.filter(d => d.name === currentUser.name);
+      if(myLeaves.length === 0) {
+        container.innerHTML = `<p class='text-muted text-center py-3 small m-0'>您目前沒有任何請假預定</p>`; return;
+      }
+      let html = "";
+      myLeaves.forEach((x, idx) => {
+        html += `
+        <div class="d-flex justify-content-between align-items-center py-3 border-bottom">
+          <div><strong>${x.name}</strong> <span class="text-muted small">${x.date}</span><br><small class="text-secondary">時段: ${x.type} (${x.memo})</small></div>
+          <button class="btn btn-sm btn-outline-danger" onclick="removeLeave(${idx})"><i class="fa-solid fa-trash"></i></button>
+        </div>`;
+      });
+      container.innerHTML = html;
+    }
+
+    function removeLeave(index) {
+      mockDb.splice(index, 1); renderMyTrips(); if(calendar) calendar.render(); handleTopFilter('day');
+    }
+  </script>
+</body>
+</html>
