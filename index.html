@@ -33,9 +33,38 @@
       box-shadow: 0 10px 30px rgba(17, 75, 95, 0.08);
       padding: 40px 30px; width: 100%; max-width: 400px; text-align: center;
     }
+    /* 🎯 放大並微調中央 Logo 區塊 */
+    .login-logo-box {
+      width: 100%;
+      height: 160px; /* 拉大容器高度 */
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 25px;
+      overflow: hidden;
+    }
+    .login-logo-box img {
+      width: 260px; /* 大幅放大以抵消留白 */
+      height: 260px;
+      object-fit: contain;
+      margin-top: -10px;
+    }
     .login-btn-gradient {
       background: linear-gradient(90deg, #79C2E6 0%, #F4BD93 100%);
       color: white !important; border: none; border-radius: 14px; font-weight: bold; padding: 12px;
+    }
+    /* 密碼眼睛專用樣式 */
+    .password-wrapper {
+      position: relative;
+    }
+    .password-toggle-icon {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      cursor: pointer;
+      color: #a0b0b5;
+      z-index: 10;
     }
     .occ-navbar { background-color: var(--pantone-navy); color: white; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; }
     .navbar-brand-box { display: flex; align-items: center; gap: 8px; font-size: 19px; font-weight: bold; }
@@ -73,30 +102,42 @@
 </head>
 <body>
 
+  <!-- 連線讀取遮罩 -->
   <div id="loading-spinner" class="spinner-overlay" style="display:none;">
     <div class="spinner-border text-success" role="status"><span class="visually-hidden">Loading...</span></div>
   </div>
 
+  <!-- 1. 登入畫面 -->
   <div id="section-login" class="login-page-bg" style="display: none;">
     <div class="login-card-custom">
-      <span id="login-logo-container" style="display:block; margin-bottom:15px; font-size:48px;">🌴</span>
-      <h3 class="mb-4" style="color: var(--pantone-navy); font-weight: 800;">OCC休假表</h3>
+      <!-- 🎯 移除文字，改用獨立放大的 Logo 容器區塊 -->
+      <div class="login-logo-box" id="login-logo-container">
+        <img src="logo.png" alt="Logo">
+      </div>
+      
+      <!-- 🎯 移除功號提示 placeholder -->
       <div class="mb-3 text-start">
         <label class="form-label text-secondary small fw-bold">員工人資帳號</label>
-        <input type="text" id="login-account" class="form-control py-2" placeholder="如：h74290" style="border-radius:12px;">
+        <input type="text" id="login-account" class="form-control py-2" placeholder="請輸入人資帳號" style="border-radius:12px;">
       </div>
+      
+      <!-- 🎯 密碼欄位與右側眼睛眼睛圖示 -->
       <div class="mb-4 text-start">
         <label class="form-label text-secondary small fw-bold">登入密碼</label>
-        <input type="password" id="login-password" class="form-control py-2" placeholder="請輸入密碼" style="border-radius:12px;">
+        <div class="password-wrapper">
+          <input type="password" id="login-password" class="form-control py-2" placeholder="請輸入密碼" style="border-radius:12px; padding-right: 40px;">
+          <i class="fa-solid fa-eye password-toggle-icon" id="toggle-password-btn" onclick="togglePasswordVisibility()"></i>
+        </div>
       </div>
       <button class="btn w-100 login-btn-gradient" onclick="handleLogin()">安全登入</button>
     </div>
   </div>
 
+  <!-- 2. 主系統介面 -->
   <div id="main-application" style="display: none;">
     <div class="occ-navbar">
       <div class="navbar-brand-box" id="nav-brand-box">
-        <i class="fa-solid fa-plane-departure" id="nav-fallback-icon"></i>
+        <img src="logo.png" alt="logo">
         <span>OCC 休假表</span>
       </div>
       <div>
@@ -114,8 +155,10 @@
     </div>
 
     <div class="container-fluid calendar-container">
+      <!-- A. 首頁月曆 -->
       <div id="sect-home" class="app-section active"><div id="calendar"></div></div>
 
+      <!-- B. 預定請假 -->
       <div id="sect-reserve" class="app-section">
         <div class="card-custom">
           <h5 class="mb-4 fw-bold" style="color:var(--pantone-navy);"><i class="fa-solid fa-calendar-check me-2"></i>填寫請假申請</h5>
@@ -152,6 +195,7 @@
         </div>
       </div>
 
+      <!-- C. 行程管理 -->
       <div id="sect-mytrips" class="app-section">
         <div class="card-custom">
           <h5 class="mb-3 fw-bold" style="color:var(--pantone-navy);"><i class="fa-solid fa-clock-rotate-left me-2"></i>我的請假清單</h5>
@@ -159,6 +203,7 @@
         </div>
       </div>
 
+      <!-- D. 單位總覽 -->
       <div id="sect-overview" class="app-section">
         <div class="top-filter-bar mb-3">
           <button class="top-filter-btn active" id="filter-btn-day" onclick="handleTopFilter('day')">今日</button>
@@ -176,6 +221,7 @@
       </div>
     </div>
 
+    <!-- 底部功能列 -->
     <div class="occ-footer">
       <button class="footer-item active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>首頁</button>
       <button class="footer-item" onclick="switchTab('reserve', this)"><i class="fa-solid fa-calendar-plus"></i>預定請假</button>
@@ -184,6 +230,7 @@
     </div>
   </div>
 
+  <!-- 改密碼視窗 -->
   <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered mx-3">
       <div class="modal-content" style="border-radius: 24px;">
@@ -200,12 +247,12 @@
     </div>
   </div>
 
-  <script src="https://cdnjs.bootstrap.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
 
   <script>
-    // 🎯 5. 請在下方引號內填入您全新部署好的 Google Apps Script 網址 
+    // 🎯 重要：正式上線前，請將下方引號內填入您在 Google Sheet 上部署得到的 GAS 網址！
     const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbwS7MuovR9r-lxD15dSq9_GoLHncSl_NTIqo3wxhW7oWyanTp129c1NbgaYLG0kQQDDAg/exec"; 
 
     let calendar = null;
@@ -214,7 +261,7 @@
     let currentActiveFilter = 'day';
     let pickersInitialized = false;
 
-    // 系統本地暫存的當月休假總表（開啟網頁時可先作假資料展示，送出會同步送 GAS）
+    // 系統本地展示用假資料
     let mockDb = [
       { name: "怡君", date: "2026-06-12", start: "08:00", end: "17:00", memo: "特休", applicant: "怡君" },
       { name: "怡君", date: "2026-06-23", start: "08:00", end: "17:00", memo: "特休", applicant: "怡君" }
@@ -226,19 +273,25 @@
       checkLoginState();
     });
 
-    // 🎯 自動探測外部多媒體檔案（logo 和 背景圖）
+    // 自動偵測背景圖
     function autoDetectAssets() {
-      const logoImg = new Image(); logoImg.src = "logo.png";
-      logoImg.onload = function() {
-        document.getElementById("login-logo-container").innerHTML = `<img src="logo.png" style="height:75px; width:auto; object-fit:contain;">`;
-        const navBrand = document.getElementById("nav-brand-box");
-        const fallback = document.getElementById("nav-fallback-icon");
-        if(fallback) fallback.remove();
-        navBrand.insertAdjacentHTML('afterbegin', `<img src="logo.png" alt="logo">`);
-      };
-      
       const bgImg = new Image(); bgImg.src = "background.jpg";
       bgImg.onload = function() { document.querySelector(".login-page-bg").style.backgroundImage = "url('background.jpg')"; };
+    }
+
+    // 控制眼睛顯示隱藏密碼
+    function togglePasswordVisibility() {
+      const pwdInput = document.getElementById("login-password");
+      const icon = document.getElementById("toggle-password-btn");
+      if (pwdInput.type === "password") {
+        pwdInput.type = "text";
+        icon.classList.remove("fa-eye");
+        icon.classList.add("fa-eye-slash");
+      } else {
+        pwdInput.type = "password";
+        icon.classList.remove("fa-eye-slash");
+        icon.classList.add("fa-eye");
+      }
     }
 
     function checkLoginState() {
@@ -247,20 +300,20 @@
       else { document.getElementById('section-login').style.display = 'block'; }
     }
 
-    // 🎯 透過 GAS 即時比對 Sheet 名冊登入
+    // 🎯 登入處理
     function handleLogin() {
       const acc = document.getElementById('login-account').value.trim();
       const pass = document.getElementById('login-password').value;
       if(!acc || !pass) { alert('請輸入帳號密碼'); return; }
 
+      // 🎯 安全救援機制：如果您還沒換上 GAS 網址，可以用這組帳密直接登入進去看畫面效果！
       if(GOOGLE_SHEET_API.includes("請在")) {
-        // 安全機制：若尚未貼上網址，則啟用本地緊急登入（方便您測試網頁外觀）
-        if(acc === "h74290" && pass === "Aa123456") {
+        if(acc.toLowerCase() === "h74290" && pass === "123456") {
           currentUser = { account: "h74290", name: "怡君" };
           localStorage.setItem('occ_user', JSON.stringify(currentUser));
           showMainApp(); return;
         }
-        alert("請先在代碼中填寫 Google GAS 網址以對接員工名冊工作表！"); return;
+        alert("帳號或密碼錯誤。提示：若尚未設定 GAS 網址，本地測試帳號為 h74290，密碼為 123456"); return;
       }
 
       showLoading(true);
@@ -277,7 +330,7 @@
           showMainApp();
         } else { alert(data.message); }
       })
-      .catch(err => { showLoading(false); alert("連線 Sheet 失敗，請確認 GAS 權限開至「任何人」！"); });
+      .catch(err => { showLoading(false); alert("連線 Sheet 失敗，請確認 GAS 是否已發布，且權限開至「任何人(Anyone)」！"); });
     }
 
     function handleLogout() { localStorage.clear(); window.location.reload(); }
@@ -287,20 +340,20 @@
       document.getElementById('main-application').style.display = 'block';
       document.getElementById('user-greeting').innerText = currentUser.name;
       
-      // 🎯 判斷怡君為管理員
       if(currentUser.account.toLowerCase() === "h74290" || currentUser.name === "怡君") {
         document.getElementById('admin-shield').style.display = 'inline-block';
       }
       setTimeout(() => { initCalendar(); handleTopFilter('day'); }, 100);
     }
 
-    // 🎯 修改密碼同步更新至 Sheet
     function submitChangePassword() {
       const oldPwd = document.getElementById('pwd-old').value;
       const n1 = document.getElementById('pwd-new').value;
       const n2 = document.getElementById('pwd-confirm').value;
       if(!oldPwd || !n1 || !n2) { alert('請填寫所有欄位'); return; }
       if(n1 !== n2) { alert('兩次新密碼不符'); return; }
+
+      if(GOOGLE_SHEET_API.includes("請在")) { alert("本機測試模式下無法修改 Sheet 密碼，請先換上真實 GAS 網址。"); return; }
 
       showLoading(true);
       fetch(GOOGLE_SHEET_API, {
@@ -340,6 +393,14 @@
       if(start.value) { document.getElementById('leave-end-date').value = start.value; start.blur(); }
     }
 
+    document.getElementById('leave-start-date').addEventListener('focus', function() {
+      if (window.innerWidth <= 768) {
+        setTimeout(() => {
+          this.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 300);
+      }
+    });
+
     function setLeaveType(type) {
       selectedLeaveType = type;
       document.getElementById('btn-time-full').classList.toggle('active', type === 'full');
@@ -348,7 +409,6 @@
       if(type === 'custom') initLazyPickers();
     }
 
-    // 🎯 送出假單至 Google Sheet
     function submitLeave() {
       const dVal = document.getElementById('leave-start-date').value;
       const memoVal = document.getElementById('leave-memo').value.trim();
@@ -365,7 +425,7 @@
         start: startTime, end: endTime, memo: memoVal || "無", applicant: currentUser.name
       };
 
-      mockDb.push(postObj); // 暫存網頁
+      mockDb.push(postObj); 
 
       if(!GOOGLE_SHEET_API.includes("請在")) {
         showLoading(true);
@@ -373,7 +433,7 @@
         .then(() => { showLoading(false); alert("已同步寫入 Google Sheet！"); resetLeaveForm(); })
         .catch(() => { showLoading(false); alert("寫入失敗，但已存在本機臨時紀錄中。"); resetLeaveForm(); });
       } else {
-        alert("請假送出成功（本機紀錄）！"); resetLeaveForm();
+        alert("請假送出成功（本地暫存模式）！"); resetLeaveForm();
       }
     }
 
@@ -447,7 +507,7 @@
             if(el.children[idx]) el.children[idx].classList.add('selected');
           }, 60);
         });
-      };
+      });
       fill('picker-sh', 24); fill('picker-sm', 60); fill('picker-eh', 24); fill('picker-em', 60);
       
       const uEl = document.getElementById('picker-ov-user');
