@@ -1,33 +1,46 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <title>OCC 休假系統</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+  <style>
+    body { background: #F8FBFB; height: 100vh; display: flex; align-items: center; justify-content: center; }
+    .card { width: 100%; max-width: 400px; padding: 30px; border-radius: 20px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); }
+  </style>
+</head>
 <body>
-    <h3>OCC 系統登入</h3>
-    <input type="text" id="acc" placeholder="帳號"><br>
-    <input type="password" id="pass" placeholder="密碼"><br>
-    <button onclick="login()">點我登入</button>
+<div class="card">
+  <h4 class="text-center mb-4">OCC 休假系統</h4>
+  <input type="text" id="acc" class="form-control mb-3" placeholder="員工帳號">
+  <input type="password" id="pass" class="form-control mb-3" placeholder="登入密碼">
+  <button class="btn btn-primary w-100" onclick="login()">登入</button>
+</div>
 
-    <script>
-        // 把下面這行換成你最新部署的網址，確保前後沒有空格
-        const GAS_URL = "https://script.google.com/macros/s/AKfycbwNTSDQciYQOdRwH4mIx52UncsIdssSQ0dH2cdO8dmaYQxRX9viSP7zu5uvQSa5LEzxAg/exec"; 
+<script>
+  // 請填入剛才部署後複製的最新網址
+  const GAS_URL = "https://script.google.com/macros/s/AKfycbwUZGtUUntv438GKyEWR5IYQiRiM0OW-S8QgeLchWrLPyQJRgl6Oc9lhnj-iX5SWIJg-Q/exec"; 
 
-        function login() {
-            fetch(GAS_URL, {
-                method: "POST",
-                mode: "cors", // 確保使用 cors 模式
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    action: "login", 
-                    account: document.getElementById('acc').value, 
-                    password: document.getElementById('pass').value 
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === "success") alert("登入成功，歡迎 " + data.name);
-                else alert("帳密錯誤");
-            })
-            .catch(err => alert("錯誤: " + err));
-        }
-    </script>
+  function login() {
+    const acc = document.getElementById('acc').value.trim();
+    const pass = document.getElementById('pass').value.trim();
+    
+    fetch(GAS_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ action: "login", account: acc, password: pass })
+    })
+    .then(res => res.json())
+    .then(data => {
+      if(data.status === "success") {
+        alert("歡迎 " + data.name);
+        document.body.innerHTML = "<h3 class='text-center mt-5'>登入成功！</h3>";
+      } else {
+        alert("帳號或密碼錯誤");
+      }
+    })
+    .catch(err => alert("連線失敗，請檢查網址是否有更新"));
+  }
+</script>
 </body>
 </html>
