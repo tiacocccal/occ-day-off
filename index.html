@@ -229,29 +229,54 @@
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
 
   <script>
-    // 🎯 填入你重新部署後拿到的最新 URL 網址
-    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbxV2lHxwivzDP2yMBjPQ-2JuMMF2Z98g-uUoBqzgcchI3LfA9YfLI53Zs0DXL5zxPjK5Q/exec"; 
+    // 1. 全域變數定義區 (非常重要，必須放在所有函式之前)
+    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbxV2lHxwivzDP2yMBjPQ-2JuMMF2Z98g-uUoBqzgcchI3LfA9YfLI53Zs0DXL5zxPjK5Q/exec"; 
+    let calendar = null;
+    let currentUser = null;
+    let selectedLeaveType = 'full';
+    let currentActiveFilter = 'day';
+    let pickersInitialized = false;
+    let mockDb = []; // 務必初始化為空陣列
+    let userList = ["同仁A", "同仁B", "同仁C"]; // 請填入實際的同仁名單
 
-    let calendar = null;
-    let currentUser = null;
-    let selectedLeaveType = 'full';
-    let currentActiveFilter = 'day';
-    let pickersInitialized = false;
+    // 2. 確保頁面載入時先執行登入檢查
+    document.addEventListener("DOMContentLoaded", function() {
+      checkLoginState();
+      // 延遲初始化其他元件
+      setTimeout(() => {
+          try { initLazyPickers(); } catch (e) { console.error(e); }
+      }, 500);
+    });
 
-    let realData = []; // 用這個取代 mockDb
+    // 🎯 填入最新 URL
+    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbxV2lHxwivzDP2yMBjPQ-2JuMMF2Z98g-uUoBqzgcchI3LfA9YfLI53Zs0DXL5zxPjK5Q/exec"; 
 
-    function fetchAllLeaves() {
-      showLoading(true);
-      fetch(GOOGLE_SHEET_API + "?action=getData") // 假設你的 GAS 有寫這個 action
-        .then(res => res.json())
-        .then(data => {
-          realData = data; // 這裡存入 Google Sheet 抓回來的資料
-          showLoading(false);
-          // 抓到資料後，重新渲染日曆
-          if(calendar) calendar.render(); 
-        })
-        .catch(err => console.error("抓取資料失敗", err));
-    }
+    // 初始化必要變數，避免 ReferenceError
+    let calendar = null;
+    let currentUser = null;
+    let selectedLeaveType = 'full';
+    let currentActiveFilter = 'day';
+    let pickersInitialized = false;
+    let realData = [];
+    let mockDb = []; // 初始化空陣列
+    let userList = ["同仁A", "同仁B", "同仁C"]; // 請在這裡加入您的同仁名單
+
+    // 確保 fetchAllLeaves 在頁面載入時被呼叫
+    function fetchAllLeaves() {
+      showLoading(true);
+      fetch(GOOGLE_SHEET_API + "?action=getData")
+        .then(res => res.json())
+        .then(data => {
+          realData = data;
+          mockDb = data; // 同步資料
+          showLoading(false);
+          if(calendar) calendar.render(); 
+        })
+        .catch(err => {
+          showLoading(false);
+          console.error("抓取資料失敗", err);
+        });
+    }
     
     // 將原本的 DOMContentLoaded 替換為以下邏輯
     document.addEventListener("DOMContentLoaded", function() {
