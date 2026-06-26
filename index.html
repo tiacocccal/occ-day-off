@@ -84,25 +84,9 @@
       width: 100% !important;
       overflow: hidden;
     }
-    .calendar-container {
-      width: 100vw !important;
-      padding: 10px !important;
-      box-sizing: border-box;
-    /* 強制日曆容器自適應 */
-    .fc {
-      max-width: 100% !important;
-      width: 100% !important;
-    }
-
-    /* 確保切換 Tab 時，日曆能重新計算尺寸 */
-    .app-section {
-      display: none;
-      width: 100%;
-    }
-    .app-section.active {
-      display: block;
-    }  
-    }
+    .calendar-container { width: 100%; padding: 10px; box-sizing: border-box; }
+    .app-section { display: none; width: 100%; }
+    .app-section.active { display: block; }
   </style>
 </head>
 <body>
@@ -284,33 +268,25 @@
       }
     });
 
-    // 在顯示主畫面時進行防錯載入
-    function showMainApp() {
-      document.getElementById('section-login').style.display = 'none';
-      document.getElementById('main-application').style.display = 'block';
-      document.getElementById('user-greeting').innerText = currentUser.name;
+    // 統一的 showMainApp 函式
+    function showMainApp() {
+      document.getElementById('section-login').style.display = 'none';
+      document.getElementById('main-application').style.display = 'block';
+      document.getElementById('user-greeting').innerText = currentUser.name;
+      
+      // 管理員徽章判斷
+      if(currentUser.account.toLowerCase() === "h74290" || currentUser.name === "怡君") {
+        document.getElementById('admin-shield').style.display = 'inline-block';
+      }
+      
+      // 延遲初始化日曆
+      setTimeout(() => { 
+          if(typeof initCalendar === 'function') initCalendar(); 
+          if(typeof handleTopFilter === 'function') handleTopFilter('day');
+      }, 300);
+    }
   
-      if(currentUser.account.toLowerCase() === "h74290" || currentUser.name === "怡君") {
-        document.getElementById('admin-shield').style.display = 'inline-block';
-      }
-  
-      // 延遲初始化，確保 DOM 已完全繪製
-      setTimeout(() => { 
-        initCalendar(); 
-        handleTopFilter('day'); 
-      }, 300);
-    }
-  
-      // 確保 FullCalendar 確實被載入後才執行
-      if (typeof FullCalendar !== 'undefined') {
-        setTimeout(() => { 
-          initCalendar(); 
-          handleTopFilter('day'); 
-        }, 500); // 延長延遲確保資源已就緒
-      } else {
-        alert("系統核心元件載入失敗，請檢查網路連線");
-      }
-    }
+
     function autoDetectAssets() {
       const bgImg = new Image(); bgImg.src = "background.jpg";
       bgImg.onload = function() { document.querySelector(".login-page-bg").style.backgroundImage = "url('background.jpg')"; };
@@ -378,16 +354,6 @@
 
     function handleLogout() { localStorage.clear(); window.location.reload(); }
 
-    function showMainApp() {
-      document.getElementById('section-login').style.display = 'none';
-      document.getElementById('main-application').style.display = 'block';
-      document.getElementById('user-greeting').innerText = currentUser.name;
-      
-      if(currentUser.account.toLowerCase() === "h74290" || currentUser.name === "怡君") {
-        document.getElementById('admin-shield').style.display = 'inline-block';
-      }
-      setTimeout(() => { initCalendar(); handleTopFilter('day'); }, 100);
-    }
 
     function submitChangePassword() {
       const oldPwd = document.getElementById('pwd-old').value;
