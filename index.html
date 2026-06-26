@@ -79,7 +79,17 @@
     .top-filter-btn { flex: 1; border: none; background: none; padding: 10px 4px; font-size: 13px; font-weight: 600; color: #7c8e94; border-radius: 10px; }
     .top-filter-btn.active { background: var(--pantone-navy); color: white; }
     .spinner-overlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,255,255,0.8); z-index:9999; display:flex; align-items:center; justify-content:center; }
-  </style>
+    .fc {
+      max-width: 100% !important;
+      width: 100% !important;
+      overflow: hidden;
+    }
+    .calendar-container {
+      width: 100vw !important;
+      padding: 10px !important;
+      box-sizing: border-box;
+    }
+  </style>
 </head>
 <body>
 
@@ -230,24 +240,52 @@
     let currentActiveFilter = 'day';
     let pickersInitialized = false;
 
-    let mockDb = [
-      { name: "怡君", date: "2026-06-12", start: "08:00", end: "17:00", memo: "特休", applicant: "怡君" },
-      { name: "怡君", date: "2026-06-23", start: "08:00", end: "17:00", memo: "特休", applicant: "怡君" }
-    ];
-    const userList = ["怡君", "慶隆", "時彥", "其正", "宜霖", "莉詩", "微儀", "芃安", "暐喬", "人鋒", "翌安", "璽元", "貞瑜", "玉茹"];
+    let realData = []; // 用這個取代 mockDb
 
+    function fetchAllLeaves() {
+      showLoading(true);
+      fetch(GOOGLE_SHEET_API + "?action=getData") // 假設你的 GAS 有寫這個 action
+        .then(res => res.json())
+        .then(data => {
+          realData = data; // 這裡存入 Google Sheet 抓回來的資料
+          showLoading(false);
+          // 抓到資料後，重新渲染日曆
+          if(calendar) calendar.render(); 
+        })
+        .catch(err => console.error("抓取資料失敗", err));
+    }
+    
+    // 將原本的 DOMContentLoaded 替換為以下邏輯
     document.addEventListener("DOMContentLoaded", function() {
-      try { autoDetectAssets(); } catch (e) { console.log("資產加載忽略", e); }
-      try {
-        initLazyPickers();
-        checkLoginState();
-      } catch (e) {
-        console.error("初始化崩潰攔截:", e);
-        document.getElementById('section-login').style.display = 'block';
-        document.getElementById('main-application').style.display = 'none';
-      }
+      console.log("頁面載入中...");
+  
+      // 1. 先顯示登入狀態檢查
+      checkLoginState();
+  
+      // 2. 只有在登入後才進行 Calendar 初始化，避免崩潰
+      try {
+        initLazyPickers();
+      } catch (e) {
+        console.error("初始化選取器失敗:", e);
+      }
     });
 
+    // 在顯示主畫面時進行防錯載入
+    function showMainApp() {
+      document.getElementById('section-login').style.display = 'none';
+      document.getElementById('main-application').style.display = 'block';
+      document.getElementById('user-greeting').innerText = currentUser.name;
+  
+      // 確保 FullCalendar 確實被載入後才執行
+      if (typeof FullCalendar !== 'undefined') {
+        setTimeout(() => { 
+          initCalendar(); 
+          handleTopFilter('day'); 
+        }, 500); // 延長延遲確保資源已就緒
+      } else {
+        alert("系統核心元件載入失敗，請檢查網路連線");
+      }
+    }
     function autoDetectAssets() {
       const bgImg = new Image(); bgImg.src = "background.jpg";
       bgImg.onload = function() { document.querySelector(".login-page-bg").style.backgroundImage = "url('background.jpg')"; };
