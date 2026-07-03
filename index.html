@@ -1,609 +1,861 @@
 <!DOCTYPE html>
 <html lang="zh-TW">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>OCC 休假表</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-  <style>
-    :root {
-      --pantone-turquoise: #00A896;  
-      --pantone-dark-sea: #028090;   
-      --pantone-navy: #114B5F;       
-      --pantone-light-bg: #F8FBFB;   
-      --occ-green-bg: #BCE3DF;       
-      --occ-green-border: #4AA39A;   
-      --occ-label-bg: #D2EFEA;       
-    }
-    body {
-      background-color: var(--pantone-light-bg);
-      font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
-      margin: 0; padding-bottom: 85px; user-select: none;
-    }
-    .login-page-bg {
-      min-height: 100vh;
-      background: linear-gradient(180deg, #B9E3F8 0%, #E3F2FA 40%, #FFFFFF 100%);
-      background-size: cover; background-position: center;
-      display: flex; align-items: center; justify-content: center; padding: 20px;
-    }
-    .login-card-custom {
-      background: rgba(255, 255, 255, 0.95); border-radius: 32px;
-      box-shadow: 0 10px 30px rgba(17, 75, 95, 0.08);
-      padding: 40px 30px; width: 100%; max-width: 90%; text-align: center;
-    }
-    .login-page-bg {
-    min-height: 100vh;
-    display: flex;
-    align-items: center; 
-    justify-content: center;
-    padding: 10px; /* 縮減間距 */
-    background: linear-gradient(180deg, #B9E3F8 0%, #FFFFFF 100%);
-    }
-
-    .login-card-custom {
-        background: rgba(255, 255, 255, 0.95);
-        border-radius: 24px;
-        padding: 20px;
-        width: 100%;
-        max-width: 400px; /* 限制最大寬度 */
-        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-    }
-
-    .login-logo-box {
-        width: 100%;
-        height: auto; /* 移除固定高度 */
-        display: flex;
-        justify-content: center;
-        margin-bottom: 15px;
-    }
-
-    .login-logo-box img {
-        width: 150px; /* 直接縮小圖片 */
-        height: auto;
-        object-fit: contain;
-    }
-    .login-btn-gradient {
-      background: linear-gradient(90deg, #79C2E6 0%, #F4BD93 100%);
-      color: white !important; border: none; border-radius: 14px; font-weight: bold; padding: 12px;
-    }
-    .password-wrapper { position: relative; }
-    .password-toggle-icon {
-      position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #a0b0b5; z-index: 10;
-    }
-    .occ-navbar { background-color: var(--pantone-navy); color: white; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; }
-    .navbar-brand-box { display: flex; align-items: center; gap: 8px; font-size: 19px; font-weight: bold; }
-    .navbar-brand-box img { height: 32px; max-height: 35px; width: auto; object-fit: contain; }
-    .status-bar { background-color: white; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #EAEAEA; }
-    .user-greeting-box { font-size: 17px; font-weight: 800; color: #028090; }
-    .admin-badge { background-color: #FFEBEB; color: #FF4D4D; font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: bold; margin-left: 6px; display: none; }
-    .occ-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: white; box-shadow: 0 -3px 12px rgba(0,0,0,0.04); display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
-    .footer-item { display: flex; flex-direction: column; align-items: center; color: #8c9ba5; font-size: 11px; background: none; border: none; width: 25%; }
-    .footer-item.active { color: var(--pantone-dark-sea); font-weight: bold; }
-    .footer-item i { font-size: 20px; margin-bottom: 3px; }
-    .fc { background: white; border-radius: 24px; padding: 16px 8px; box-shadow: 0 4px 20px rgba(17, 75, 95, 0.04); border: none !important; }
-    .fc-theme-standard td, .fc-theme-standard th, .fc-theme-standard .fc-scrollgrid { border: none !important; }
-    .fc-daygrid-day { height: 95px !important; }
-    .fc-day-today { background-color: var(--occ-green-bg) !important; border-radius: 12px !important; border: 1.5px solid var(--occ-green-border) !important; }
-    .occ-leave-label { background-color: var(--occ-label-bg) !important; color: #028090 !important; font-size: 11px !important; font-weight: bold; text-align: center; padding: 3px 4px; margin: 2px auto 0 auto; border-radius: 6px; width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
-    .card-custom { background: white; border-radius: 24px; box-shadow: 0 8px 24px rgba(11, 75, 95, 0.06); border: none; padding: 20px; margin-bottom: 16px; }
-    .app-section { display: none; }
-    .app-section.active { display: block; }
-    .toggle-group { display: flex; background: #e4ecec; border-radius: 12px; padding: 4px; }
-    .toggle-btn { flex: 1; border: none; background: none; padding: 8px; font-weight: bold; color: #666; border-radius: 10px; }
-    .toggle-btn.active { background: white; color: var(--pantone-navy); box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-    .ios-picker-container { display: flex; justify-content: center; background: #f4fafb; border-radius: 16px; padding: 12px 10px; position: relative; }
-    .ios-picker-container::before { content: ""; position: absolute; left: 8px; right: 8px; top: 50%; transform: translateY(-50%); height: 36px; background: rgba(2, 128, 144, 0.06); border-top: 1px solid rgba(2, 128, 144, 0.15); border-bottom: 1px solid rgba(2, 128, 144, 0.15); border-radius: 8px; pointer-events: none; z-index: 5; }
-    .ios-picker-col { height: 108px; overflow-y: scroll; scroll-snap-type: y mandatory; width: 70px; text-align: center; scrollbar-width: none; position: relative; }
-    .ios-picker-col::-webkit-scrollbar { display: none; }
-    .ios-picker-item { height: 36px; line-height: 36px; scroll-snap-align: center; font-size: 15px; color: #b0c2c5; }
-    .ios-picker-item.selected { color: var(--pantone-navy) !important; font-weight: 800 !important; font-size: 17px !important; }
-    .top-filter-bar { display: flex; background: white; border-radius: 14px; padding: 4px; gap: 4px; }
-    .top-filter-btn { flex: 1; border: none; background: none; padding: 10px 4px; font-size: 13px; font-weight: 600; color: #7c8e94; border-radius: 10px; }
-    .top-filter-btn.active { background: var(--pantone-navy); color: white; }
-    .spinner-overlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,255,255,0.8); z-index:9999; display:flex; align-items:center; justify-content:center; }
-    /* 日曆容器強制約束 */
-    .calendar-container { 
-        padding: 10px; 
-        width: 100%; 
-        box-sizing: border-box; /* 確保 padding 不會撐開寬度 */
-        overflow: hidden; 
-    }
-    #calendar { 
-        width: 100%; 
-        max-width: 100%; 
-        margin: 0 auto; 
-    }
-    .app-section { display: none; width: 100%; }
-    .app-section.active { display: block; }
-
-    /* 修正 FullCalendar 內部元件 */
-    .fc { 
-        width: 100% !important; 
-        table-layout: fixed; /* 強制表格固定寬度 */
-    }
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>OCC 休假表</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    :root {
+      --pantone-turquoise: #00A896;
+      --pantone-dark-sea: #028090;
+      --pantone-navy: #114B5F;
+      --pantone-light-bg: #F8FBFB;
+      --occ-green-bg: #BCE3DF;
+      --occ-green-border: #4AA39A;
+      --occ-label-bg: #D2EFEA;
+    }
+    body {
+      background-color: var(--pantone-light-bg);
+      font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
+      margin: 0; padding-bottom: 85px; user-select: none;
+    }
+    .login-page-bg {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      background: linear-gradient(180deg, #B9E3F8 0%, #FFFFFF 100%);
+    }
+    .login-card-custom {
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 24px;
+      padding: 32px 24px;
+      width: 100%;
+      max-width: 400px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    /* 修正 logo 撐爆版面的問題：用固定框限制寬高，不管圖片原始比例都不會爆版 */
+    .login-logo-box {
+      width: 100%;
+      height: 90px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+    .login-logo-box img {
+      max-width: 220px;
+      max-height: 90px;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+    .login-btn-gradient {
+      background: linear-gradient(90deg, #79C2E6 0%, #F4BD93 100%);
+      color: white !important; border: none; border-radius: 14px; font-weight: bold; padding: 12px;
+    }
+    .password-wrapper { position: relative; }
+    .password-toggle-icon {
+      position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #a0b0b5; z-index: 10;
+    }
+    .occ-navbar { background-color: var(--pantone-navy); color: white; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; }
+    .navbar-brand-box { display: flex; align-items: center; gap: 8px; font-size: 19px; font-weight: bold; }
+    .navbar-brand-box img { max-height: 28px; width: auto; object-fit: contain; }
+    .status-bar { background-color: white; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #EAEAEA; }
+    .user-greeting-box { font-size: 17px; font-weight: 800; color: #028090; }
+    .admin-badge { background-color: #FFEBEB; color: #FF4D4D; font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: bold; margin-left: 6px; display: none; }
+    .occ-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: white; box-shadow: 0 -3px 12px rgba(0,0,0,0.04); display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
+    .footer-item { display: flex; flex-direction: column; align-items: center; color: #8c9ba5; font-size: 11px; background: none; border: none; width: 25%; }
+    .footer-item.active { color: var(--pantone-dark-sea); font-weight: bold; }
+    .footer-item i { font-size: 20px; margin-bottom: 3px; }
+    .fc { background: white; border-radius: 24px; padding: 16px 8px; box-shadow: 0 4px 20px rgba(17, 75, 95, 0.04); border: none !important; }
+    .fc-theme-standard td, .fc-theme-standard th, .fc-theme-standard .fc-scrollgrid { border: none !important; }
+    .fc-daygrid-day { height: 95px !important; cursor: pointer; }
+    .fc-day-today { background-color: var(--occ-green-bg) !important; border-radius: 12px !important; border: 1.5px solid var(--occ-green-border) !important; }
+    .occ-leave-label { background-color: var(--occ-label-bg) !important; color: #028090 !important; font-size: 11px !important; font-weight: bold; text-align: center; padding: 3px 4px; margin: 2px auto 0 auto; border-radius: 6px; width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+    .card-custom { background: white; border-radius: 24px; box-shadow: 0 8px 24px rgba(11, 75, 95, 0.06); border: none; padding: 20px; margin-bottom: 16px; }
+    .app-section { display: none; width: 100%; }
+    .app-section.active { display: block; }
+    .toggle-group { display: flex; background: #e4ecec; border-radius: 12px; padding: 4px; }
+    .toggle-btn { flex: 1; border: none; background: none; padding: 10px; font-weight: bold; color: #666; border-radius: 10px; }
+    .toggle-btn.active { background: white; color: var(--pantone-navy); box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
+    .ios-picker-container { display: flex; justify-content: center; background: #f4fafb; border-radius: 16px; padding: 12px 10px; position: relative; }
+    .ios-picker-container::before { content: ""; position: absolute; left: 8px; right: 8px; top: 50%; transform: translateY(-50%); height: 36px; background: rgba(2, 128, 144, 0.06); border-top: 1px solid rgba(2, 128, 144, 0.15); border-bottom: 1px solid rgba(2, 128, 144, 0.15); border-radius: 8px; pointer-events: none; z-index: 5; }
+    .ios-picker-col { height: 108px; overflow-y: scroll; scroll-snap-type: y mandatory; width: 70px; text-align: center; scrollbar-width: none; position: relative; }
+    .ios-picker-col::-webkit-scrollbar { display: none; }
+    .ios-picker-item { height: 36px; line-height: 36px; scroll-snap-align: center; font-size: 15px; color: #b0c2c5; }
+    .ios-picker-item.selected { color: var(--pantone-navy) !important; font-weight: 800 !important; font-size: 17px !important; }
+    .top-filter-bar { display: flex; background: white; border-radius: 14px; padding: 4px; gap: 4px; flex-wrap: wrap; }
+    .top-filter-btn { flex: 1 1 auto; min-width: 70px; border: none; background: none; padding: 10px 4px; font-size: 12px; font-weight: 600; color: #7c8e94; border-radius: 10px; }
+    .top-filter-btn.active { background: var(--pantone-navy); color: white; }
+    .spinner-overlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,255,255,0.8); z-index:9999; display:flex; align-items:center; justify-content:center; }
+    .calendar-container { padding: 10px; width: 100%; box-sizing: border-box; overflow: hidden; }
+    #calendar { width: 100%; max-width: 100%; margin: 0 auto; }
+    .fc { width: 100% !important; table-layout: fixed; }
+    .date-range-row { display: flex; align-items: center; gap: 8px; }
+    .date-range-row .date-col { flex: 1; }
+    .date-range-row .arrow-col { flex: 0 0 24px; text-align: center; color: #999; padding-top: 22px; }
+    .leave-item-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+    .leave-item-actions button { border: none; background: none; font-size: 15px; padding: 4px 8px; }
+    .leave-item-actions .edit-btn { color: var(--pantone-dark-sea); }
+    .leave-item-actions .del-btn { color: #e05656; }
   </style>
 </head>
 <body>
+  <div id="loading-spinner" class="spinner-overlay" style="display:none;">
+    <div class="spinner-border text-success" role="status"><span class="visually-hidden">Loading...</span></div>
+  </div>
 
-  <div id="loading-spinner" class="spinner-overlay" style="display:none;">
-    <div class="spinner-border text-success" role="status"><span class="visually-hidden">Loading...</span></div>
-  </div>
+  <!-- 登入畫面 -->
+  <div id="section-login" class="login-page-bg">
+    <div class="login-card-custom">
+      <div class="login-logo-box" id="login-logo-container">
+        <img src="logo.png" alt="Logo">
+      </div>
+      <div class="mb-3 text-start">
+        <label class="form-label text-secondary small fw-bold">員工人資帳號</label>
+        <input type="text" id="login-account" class="form-control py-2" placeholder="請輸入人資帳號" style="border-radius:12px;">
+      </div>
+      <div class="mb-4 text-start">
+        <label class="form-label text-secondary small fw-bold">登入密碼</label>
+        <div class="password-wrapper">
+          <input type="password" id="login-password" class="form-control py-2" placeholder="請輸入密碼" style="border-radius:12px; padding-right: 40px;">
+          <i class="fa-solid fa-eye password-toggle-icon" id="toggle-password-btn" onclick="togglePasswordVisibility()"></i>
+        </div>
+      </div>
+      <button class="btn w-100 login-btn-gradient" onclick="handleLogin()">登入</button>
+    </div>
+  </div>
 
-  <div id="section-login" class="login-page-bg">
-    <div class="login-card-custom">
-      <div class="login-logo-box" id="login-logo-container">
-        <img src="logo.png" alt="Logo">
-      </div>
-      
-      <div class="mb-3 text-start">
-        <label class="form-label text-secondary small fw-bold">員工人資帳號</label>
-        <input type="text" id="login-account" class="form-control py-2" placeholder="請輸入人資帳號" style="border-radius:12px;">
-      </div>
-      
-      <div class="mb-4 text-start">
-        <label class="form-label text-secondary small fw-bold">登入密碼</label>
-        <div class="password-wrapper">
-          <input type="password" id="login-password" class="form-control py-2" placeholder="請輸入密碼" style="border-radius:12px; padding-right: 40px;">
-          <i class="fa-solid fa-eye password-toggle-icon" id="toggle-password-btn" onclick="togglePasswordVisibility()"></i>
-        </div>
-      </div>
-      <button class="btn w-100 login-btn-gradient" onclick="handleLogin()">登入</button>
-    </div>
-  </div>
+  <!-- 主應用程式 -->
+  <div id="main-application" style="display: none;">
+    <div class="occ-navbar">
+      <div class="navbar-brand-box" id="nav-brand-box">
+        <img src="logo.png" alt="logo">
+        <span>OCC 休假表</span>
+      </div>
+      <div>
+        <button class="btn btn-sm btn-outline-light me-1" onclick="openChangePasswordModal()">改密碼</button>
+        <button class="btn btn-sm btn-light fw-bold" onclick="handleLogout()">登出</button>
+      </div>
+    </div>
+    <div class="status-bar">
+      <div class="user-greeting-box">
+        HELLO <span id="user-greeting">同仁</span>
+        <span class="admin-badge" id="admin-shield">🛡️ 管理員模式</span>
+      </div>
+      <div class="info-tip">💡 點選日期查看詳情</div>
+    </div>
 
-  <div id="main-application" style="display: none;">
-    <div class="occ-navbar">
-      <div class="navbar-brand-box" id="nav-brand-box">
-        <img src="logo.png" alt="logo">
-        <span>OCC 休假表</span>
-      </div>
-      <div>
-        <button class="btn btn-sm btn-outline-light me-1" onclick="openChangePasswordModal()">改密碼</button>
-        <button class="btn btn-sm btn-light fw-bold" onclick="handleLogout()">登出</button>
-      </div>
-    </div>
+    <div class="container-fluid calendar-container">
 
-    <div class="status-bar">
-      <div class="user-greeting-box">
-        HELLO <span id="user-greeting">同仁</span>
-        <span class="admin-badge" id="admin-shield">🛡️ 管理員模式</span>
-      </div>
-      <div class="info-tip">💡 點選日期查看詳情</div>
-    </div>
+      <!-- 首頁：月曆 -->
+      <div id="sect-home" class="app-section active"><div id="calendar"></div></div>
 
-    <div class="container-fluid calendar-container">
-      <div id="sect-home" class="app-section active"><div id="calendar"></div></div>
+      <!-- 預定請假 -->
+      <div id="sect-reserve" class="app-section">
+        <div class="card-custom">
+          <h5 class="mb-4 fw-bold" style="color:var(--pantone-navy);"><i class="fa-solid fa-calendar-check me-2"></i><span id="reserve-form-title">填寫請假申請</span></h5>
 
-      <div id="sect-reserve" class="app-section">
-        <div class="card-custom">
-          <h5 class="mb-4 fw-bold" style="color:var(--pantone-navy);"><i class="fa-solid fa-calendar-check me-2"></i>填寫請假申請</h5>
-          <div class="row g-2 mb-3">
-            <div class="col-5">
-              <label class="small text-secondary mb-1">開始日期</label>
-              <input type="date" id="leave-start-date" class="form-control" onchange="autoCloseDatePicker()">
-            </div>
-            <div class="col-2 text-center pt-4 text-muted fw-bold">➡️</div>
-            <div class="col-5">
-              <label class="small text-secondary mb-1">結束日期</label>
-              <input type="date" id="leave-end-date" class="form-control">
-            </div>
-          </div>
-          <div class="mb-3">
-            <label class="small text-secondary mb-1">時間類型</label>
-            <div class="toggle-group">
-              <button class="toggle-btn active" id="btn-time-full" onclick="setLeaveType('full')">整天 (08-17)</button>
-              <button class="toggle-btn" id="btn-time-custom" onclick="setLeaveType('custom')">自訂時段</button>
-            </div>
-          </div>
-          <div id="ios-time-picker-block" class="mb-3" style="display:none;">
-            <div class="ios-picker-container">
-              <div class="ios-picker-col" id="picker-sh"></div><div class="ios-picker-item" style="color:var(--pantone-navy); font-weight:bold;">:</div><div class="ios-picker-col" id="picker-sm"></div>
-              <div class="mx-3 align-self-center text-muted fw-bold">至</div>
-              <div class="ios-picker-col" id="picker-eh"></div><div class="ios-picker-item" style="color:var(--pantone-navy); font-weight:bold;">:</div><div class="ios-picker-col" id="picker-em"></div>
-            </div>
-          </div>
-          <div class="mb-4">
-            <label class="small text-secondary mb-1">備註事由</label>
-            <textarea id="leave-memo" class="form-control" rows="3" placeholder="請輸入事由(如：特休、公假、事假)"></textarea>
-          </div>
-          <button class="btn w-100 py-2 text-white fw-bold" style="background-color: var(--pantone-turquoise); border-radius:12px;" onclick="submitLeave()">送出至 Google Sheet</button>
-        </div>
-      </div>
+          <div class="date-range-row mb-3">
+            <div class="date-col">
+              <label class="small text-secondary mb-1">開始日期</label>
+              <input type="date" id="leave-start-date" class="form-control">
+            </div>
+            <div class="arrow-col pt-4">➡️</div>
+            <div class="date-col">
+              <label class="small text-secondary mb-1">結束日期</label>
+              <input type="date" id="leave-end-date" class="form-control">
+            </div>
+          </div>
 
-      <div id="sect-mytrips" class="app-section">
-        <div class="card-custom">
-          <h5 class="mb-3 fw-bold" style="color:var(--pantone-navy);"><i class="fa-solid fa-clock-rotate-left me-2"></i>我的請假清單</h5>
-          <div id="my-leaves-list"></div>
-        </div>
-      </div>
+          <div class="mb-3">
+            <label class="small text-secondary mb-1">時間類型</label>
+            <div class="toggle-group">
+              <button class="toggle-btn active" id="btn-time-full" onclick="setLeaveType('full')">整天 (08-17)</button>
+              <button class="toggle-btn" id="btn-time-custom" onclick="setLeaveType('custom')">特殊時段</button>
+            </div>
+          </div>
 
-      <div id="sect-overview" class="app-section">
-        <div class="top-filter-bar mb-3">
-          <button class="top-filter-btn active" id="filter-btn-day" onclick="handleTopFilter('day')">今日</button>
-          <button class="top-filter-btn" id="filter-btn-month" onclick="handleTopFilter('month')">當月</button>
-          <button class="top-filter-btn" id="filter-btn-seluser" onclick="handleTopFilter('seluser')">依人員篩選</button>
-        </div>
-        <div id="dynamic-wheel-box" class="card-custom p-3 mb-3" style="display: none; background: #f4fafb;">
-          <div id="wheel-user-wrapper">
-            <label class="small text-secondary mb-1 d-block text-center">滑動選擇人員</label>
-            <div class="ios-picker-container" style="padding: 5px;"><div class="ios-picker-col" id="picker-ov-user" style="width:120px;"></div></div>
-          </div>
-          <button class="btn btn-sm w-100 mt-2 text-white" style="background: var(--pantone-dark-sea); border:none;" onclick="executeSearchFromWheel()">確認篩選</button>
-        </div>
-        <div class="card-custom"><div id="all-leaves-list"></div></div>
-      </div>
-    </div>
+          <div id="ios-time-picker-block" class="mb-3" style="display:none;">
+            <div class="ios-picker-container">
+              <div class="ios-picker-col" id="picker-sh"></div><div class="ios-picker-item" style="color:var(--pantone-navy); font-weight:bold;">:</div><div class="ios-picker-col" id="picker-sm"></div>
+              <div class="mx-3 align-self-center text-muted fw-bold">至</div>
+              <div class="ios-picker-col" id="picker-eh"></div><div class="ios-picker-item" style="color:var(--pantone-navy); font-weight:bold;">:</div><div class="ios-picker-col" id="picker-em"></div>
+            </div>
+          </div>
 
-    <div class="occ-footer">
-      <button class="footer-item active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>首頁</button>
-      <button class="footer-item" onclick="switchTab('reserve', this)"><i class="fa-solid fa-calendar-plus"></i>預定請假</button>
-      <button class="footer-item" onclick="switchTab('mytrips', this)"><i class="fa-solid fa-route"></i>行程管理</button>
-      <button class="footer-item" onclick="switchTab('overview', this)"><i class="fa-solid fa-users"></i>單位總覽</button>
-    </div>
-  </div>
+          <div class="mb-4">
+            <label class="small text-secondary mb-1">備註事由</label>
+            <textarea id="leave-memo" class="form-control" rows="3" placeholder="請輸入事由(如：特休、公假、事假)"></textarea>
+          </div>
 
-  <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered mx-3">
-      <div class="modal-content" style="border-radius: 24px;">
-        <div class="modal-header" style="background: var(--pantone-navy); color:white;">
-          <h5 class="modal-title">修改個人密碼</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
-        </div>
-        <div class="modal-body">
-          <div class="mb-3"><label class="small text-secondary">舊密碼</label><input type="password" id="pwd-old" class="form-control"></div>
-          <div class="mb-3"><label class="small text-secondary">新密碼</label><input type="password" id="pwd-new" class="form-control"></div>
-          <div class="mb-3"><label class="small text-secondary">再次輸入新密碼</label><input type="password" id="pwd-confirm" class="form-control"></div>
-          <button class="btn w-100 text-white py-2" style="background: var(--pantone-dark-sea); border-radius:12px;" onclick="submitChangePassword()">同步更新至 Sheet</button>
-        </div>
-      </div>
-    </div>
-  </div>
+          <button class="btn w-100 py-2 text-white fw-bold" id="reserve-submit-btn" style="background-color: var(--pantone-turquoise); border-radius:12px;" onclick="submitReserveForm()">送出預定</button>
+          <button class="btn w-100 py-2 mt-2 text-secondary fw-bold" id="reserve-cancel-btn" style="display:none; border-radius:12px;" onclick="cancelEditReserve()">取消編輯</button>
+        </div>
+      </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
+      <!-- 行程管理 / 我的請假清單 -->
+      <div id="sect-mytrips" class="app-section">
+        <div class="card-custom">
+          <h5 class="mb-3 fw-bold" style="color:var(--pantone-navy);"><i class="fa-solid fa-clock-rotate-left me-2"></i>我的請假清單</h5>
+          <div id="my-leaves-list"></div>
+        </div>
+      </div>
 
-  <script>
-    // 1. 全域變數定義區 (唯一入口)
-    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbxckOblB-VsyldpwfY5lZfTlU6nxUD7O-20mfl8WaJ3onBuCjjeC_udKi53hvh9jwNqoQ/exec"; 
+      <!-- 單位總覽 -->
+      <div id="sect-overview" class="app-section">
+        <div class="top-filter-bar mb-3">
+          <button class="top-filter-btn active" id="filter-btn-day" onclick="handleTopFilter('day')">當日</button>
+          <button class="top-filter-btn" id="filter-btn-month" onclick="handleTopFilter('month')">當月</button>
+          <button class="top-filter-btn" id="filter-btn-custommonth" onclick="handleTopFilter('custommonth')">選擇月份</button>
+          <button class="top-filter-btn" id="filter-btn-seluser" onclick="handleTopFilter('seluser')">選擇人員</button>
+        </div>
+
+        <div id="custommonth-box" class="card-custom p-3 mb-3" style="display:none;">
+          <input type="month" id="overview-month-input" class="form-control" onchange="renderOverviewList('custommonth')">
+        </div>
+
+        <div id="dynamic-wheel-box" class="card-custom p-3 mb-3" style="display: none; background: #f4fafb;">
+          <div id="wheel-user-wrapper">
+            <label class="small text-secondary mb-1 d-block text-center">滑動選擇人員</label>
+            <div class="ios-picker-container" style="padding: 5px;"><div class="ios-picker-col" id="picker-ov-user" style="width:120px;"></div></div>
+          </div>
+          <button class="btn btn-sm w-100 mt-2 text-white" style="background: var(--pantone-dark-sea); border:none;" onclick="executeSearchFromWheel()">確認篩選</button>
+        </div>
+
+        <div class="card-custom"><div id="all-leaves-list"></div></div>
+      </div>
+    </div>
+
+    <div class="occ-footer">
+      <button class="footer-item active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>首頁</button>
+      <button class="footer-item" onclick="switchTab('reserve', this)"><i class="fa-solid fa-calendar-plus"></i>預定請假</button>
+      <button class="footer-item" onclick="switchTab('mytrips', this)"><i class="fa-solid fa-route"></i>行程管理</button>
+      <button class="footer-item" onclick="switchTab('overview', this)"><i class="fa-solid fa-users"></i>單位總覽</button>
+    </div>
+  </div>
+
+  <!-- 改密碼 Modal -->
+  <div class="modal fade" id="changePasswordModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered mx-3">
+      <div class="modal-content" style="border-radius: 24px;">
+        <div class="modal-header" style="background: var(--pantone-navy); color:white;">
+          <h5 class="modal-title">修改個人密碼</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3"><label class="small text-secondary">舊密碼</label><input type="password" id="pwd-old" class="form-control"></div>
+          <div class="mb-3"><label class="small text-secondary">新密碼</label><input type="password" id="pwd-new" class="form-control"></div>
+          <div class="mb-3"><label class="small text-secondary">再次輸入新密碼</label><input type="password" id="pwd-confirm" class="form-control"></div>
+          <button class="btn w-100 text-white py-2" style="background: var(--pantone-dark-sea); border-radius:12px;" onclick="submitChangePassword()">同步更新至 Sheet</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 當日請假名單 Modal（點日曆跳出） -->
+  <div class="modal fade" id="dayDetailModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered mx-3">
+      <div class="modal-content" style="border-radius: 24px;">
+        <div class="modal-header" style="background: var(--pantone-navy); color:white;">
+          <h5 class="modal-title" id="dayDetailTitle">請假名單</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div id="dayDetailList" class="mb-3"></div>
+          <button class="btn w-100 py-2 text-white fw-bold" style="background-color: var(--pantone-turquoise); border-radius:12px;" onclick="openQuickLeaveModalFromDay()"><i class="fa-solid fa-plus me-1"></i>登記請假</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 快速請假 Modal（單日） -->
+  <div class="modal fade" id="quickLeaveModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered mx-3">
+      <div class="modal-content" style="border-radius: 24px;">
+        <div class="modal-header" style="background: var(--pantone-navy); color:white;">
+          <h5 class="modal-title">登記請假表單</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="small text-secondary mb-1 d-block">請假日期</label>
+            <div id="quick-date-display" class="form-control bg-light fw-bold"></div>
+          </div>
+          <div class="mb-3">
+            <label class="small text-secondary mb-1 d-block">請假時間模式</label>
+            <div class="toggle-group">
+              <button class="toggle-btn active" id="q-btn-time-full" onclick="setQuickLeaveType('full')">整天</button>
+              <button class="toggle-btn" id="q-btn-time-custom" onclick="setQuickLeaveType('custom')">指定時間段</button>
+            </div>
+          </div>
+          <div id="q-ios-time-picker-block" class="mb-3" style="display:none;">
+            <label class="small text-secondary mb-1 d-block text-center">上下滑動設定時間段</label>
+            <div class="ios-picker-container">
+              <div class="ios-picker-col" id="q-picker-sh"></div><div class="ios-picker-item" style="color:var(--pantone-navy); font-weight:bold;">:</div><div class="ios-picker-col" id="q-picker-sm"></div>
+              <div class="mx-3 align-self-center text-muted fw-bold">至</div>
+              <div class="ios-picker-col" id="q-picker-eh"></div><div class="ios-picker-item" style="color:var(--pantone-navy); font-weight:bold;">:</div><div class="ios-picker-col" id="q-picker-em"></div>
+            </div>
+          </div>
+          <div class="mb-4">
+            <label class="small text-secondary mb-1">事由 / 備註 (選填)</label>
+            <input type="text" id="q-leave-memo" class="form-control" placeholder="如：事假、王小明代">
+          </div>
+          <button class="btn w-100 py-2 text-white fw-bold" style="background-color: var(--pantone-turquoise); border-radius:12px;" onclick="submitQuickLeave()">確認送出假單</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
+  <script>
+    // ===== 1. 全域變數 =====
+    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbwhaPMTNbbi7dFvLTcJsSOvmRSl8bx3V1WMhw1vBkauBFyC2aZCHn_-mI-0WpcSsN45ZQ/exec";
     let calendar = null;
     let currentUser = null;
-    let selectedLeaveType = 'full';
+    let selectedLeaveType = 'full';       // 預定請假分頁用
+    let selectedQuickLeaveType = 'full';  // 快速請假 Modal 用
     let currentActiveFilter = 'day';
     let pickersInitialized = false;
-    let mockDb = []; 
-    let userList = []; 
+    let mockDb = [];
+    let userList = [];
+    let editingLeaveId = null;   // 目前正在編輯的請假紀錄 id（null = 新增模式）
+    let currentDayDetailDate = null; // 目前 dayDetailModal 顯示的日期
 
-    // 2. 統一的初始化入口
     document.addEventListener("DOMContentLoaded", async function() {
-        console.log("系統初始化...");
-        checkLoginState();
-        
-        // 初始化選取器
-        try { initLazyPickers(); } catch (e) { console.error("選取器載入失敗", e); }
-
-        // 如果已登入，則載入資料
-        if (currentUser) {
-            await fetchAllLeaves();
-        }
+      checkLoginState();
+      bindDateAutoClose();
+      if (currentUser) {
+        await fetchUserList();
+        await fetchAllLeaves();
+      }
+      try { initLazyPickers(); } catch (e) { console.error("選取器載入失敗", e); }
     });
 
-    // 取得資料 (修正後的穩定版)
+    async function fetchUserList() {
+      try {
+        const res = await fetch(GOOGLE_SHEET_API + "?action=getUserList");
+        userList = await res.json();
+      } catch (err) { console.error("員工名單載入失敗", err); }
+    }
+
+    // ===== 工具：今天日期字串 (yyyy-MM-dd) =====
+    function todayStr() {
+      const d = new Date();
+      const y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+      return `${y}-${m}-${day}`;
+    }
+    function thisMonthStr() {
+      const d = new Date();
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+    }
+    // 產生 start~end 之間（含頭尾）的日期字串陣列
+    function getDateRange(startStr, endStr) {
+      const result = [];
+      let cur = new Date(startStr + "T00:00:00");
+      const end = new Date(endStr + "T00:00:00");
+      if (isNaN(cur) || isNaN(end) || cur > end) return [startStr];
+      while (cur <= end) {
+        const y = cur.getFullYear(), m = String(cur.getMonth()+1).padStart(2,'0'), d = String(cur.getDate()).padStart(2,'0');
+        result.push(`${y}-${m}-${d}`);
+        cur.setDate(cur.getDate() + 1);
+      }
+      return result;
+    }
+
+    // ===== 資料讀取 =====
     async function fetchAllLeaves() {
-        showLoading(true);
-        try {
-            const res = await fetch(GOOGLE_SHEET_API + "?action=getData");
-            mockDb = await res.json();
-            if(calendar) calendar.render(); 
-        } catch (err) {
-            console.error("資料載入失敗", err);
-        } finally {
-            showLoading(false);
-        }
+      showLoading(true);
+      try {
+        const res = await fetch(GOOGLE_SHEET_API + "?action=getData");
+        mockDb = await res.json();
+        if (calendar) calendar.render();
+        if (document.getElementById('sect-mytrips').classList.contains('active')) renderMyTrips();
+        if (document.getElementById('sect-overview').classList.contains('active')) renderOverviewList(currentActiveFilter);
+      } catch (err) {
+        console.error("資料載入失敗", err);
+      } finally {
+        showLoading(false);
+      }
     }
 
-    // 統一的 showMainApp
     function showMainApp() {
-        document.getElementById('section-login').style.display = 'none';
-        document.getElementById('main-application').style.display = 'block';
-        document.getElementById('user-greeting').innerText = currentUser ? currentUser.name : '同仁';
-        
-        setTimeout(() => { 
-            if(typeof initCalendar === 'function') initCalendar(); 
-        }, 300);
+      document.getElementById('section-login').style.display = 'none';
+      document.getElementById('main-application').style.display = 'block';
+      document.getElementById('user-greeting').innerText = currentUser ? currentUser.name : '同仁';
+      setTimeout(() => { if (typeof initCalendar === 'function') initCalendar(); }, 300);
     }
-  
 
-    function autoDetectAssets() {
-      const bgImg = new Image(); bgImg.src = "background.jpg";
-      bgImg.onload = function() { document.querySelector(".login-page-bg").style.backgroundImage = "url('background.jpg')"; };
-    }
+    function togglePasswordVisibility() {
+      try {
+        const pwdInput = document.getElementById("login-password");
+        const icon = document.getElementById("toggle-password-btn");
+        if (pwdInput.type === "password") {
+          pwdInput.type = "text"; icon.classList.remove("fa-eye"); icon.classList.add("fa-eye-slash");
+        } else {
+          pwdInput.type = "password"; icon.classList.remove("fa-eye-slash"); icon.classList.add("fa-eye");
+        }
+      } catch(e) {}
+    }
 
-    function togglePasswordVisibility() {
-      try {
-        const pwdInput = document.getElementById("login-password");
-        const icon = document.getElementById("toggle-password-btn");
-        if (pwdInput.type === "password") {
-          pwdInput.type = "text";
-          icon.classList.remove("fa-eye");
-          icon.classList.add("fa-eye-slash");
-        } else {
-          pwdInput.type = "password";
-          icon.classList.remove("fa-eye-slash");
-          icon.classList.add("fa-eye");
-        }
-      } catch(e) {}
-    }
+    function checkLoginState() {
+      const stored = localStorage.getItem('occ_user');
+      if (stored) { currentUser = JSON.parse(stored); showMainApp(); }
+      else {
+        document.getElementById('section-login').style.display = 'block';
+        document.getElementById('main-application').style.display = 'none';
+      }
+    }
 
-    function checkLoginState() {
-      const stored = localStorage.getItem('occ_user');
-      if(stored) { 
-        currentUser = JSON.parse(stored); 
-        showMainApp(); 
-      } else { 
-        document.getElementById('section-login').style.display = 'block'; 
-        document.getElementById('main-application').style.display = 'none';
-      }
-    }
+    function handleLogin() {
+      const acc = document.getElementById('login-account').value.trim();
+      const pass = document.getElementById('login-password').value;
+      if (!acc || !pass) { alert('請輸入帳號密碼'); return; }
+      showLoading(true);
+      const formData = new URLSearchParams();
+      formData.append('action', 'login'); formData.append('account', acc); formData.append('password', pass);
+      fetch(GOOGLE_SHEET_API, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
+        .then(res => res.json())
+        .then(async data => {
+          showLoading(false);
+          if (data.status === "success") {
+            currentUser = { account: data.account, name: data.name };
+            localStorage.setItem('occ_user', JSON.stringify(currentUser));
+            showMainApp();
+            await fetchUserList();
+            fillUserPicker();
+            await fetchAllLeaves();
+          } else { alert(data.message); }
+        })
+        .catch(err => { showLoading(false); console.error(err); alert("連線 Sheet 失敗！請檢查前端程式碼中的 GAS API 網址是否正確。"); });
+    }
 
-    function handleLogin() {
-      const acc = document.getElementById('login-account').value.trim();
-      const pass = document.getElementById('login-password').value;
-      if(!acc || !pass) { alert('請輸入帳號密碼'); return; }
+    function handleLogout() { localStorage.clear(); window.location.reload(); }
 
-      showLoading(true);
-      
-      const formData = new URLSearchParams();
-      formData.append('action', 'login');
-      formData.append('account', acc);
-      formData.append('password', pass);
+    function submitChangePassword() {
+      const oldPwd = document.getElementById('pwd-old').value;
+      const n1 = document.getElementById('pwd-new').value;
+      const n2 = document.getElementById('pwd-confirm').value;
+      if (!oldPwd || !n1 || !n2) { alert('請填寫所有欄位'); return; }
+      if (n1 !== n2) { alert('兩次新密碼不符'); return; }
+      showLoading(true);
+      const formData = new URLSearchParams();
+      formData.append('action', 'changePassword'); formData.append('account', currentUser.account);
+      formData.append('oldPassword', oldPwd); formData.append('newPassword', n1);
+      fetch(GOOGLE_SHEET_API, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
+        .then(res => res.json())
+        .then(data => {
+          showLoading(false);
+          if (data.status === "success") {
+            alert("密碼已成功在 Google Sheet 內更新！");
+            bootstrap.Modal.getInstance(document.getElementById('changePasswordModal')).hide();
+          } else { alert(data.message); }
+        })
+        .catch((err) => { showLoading(false); console.error(err); alert("同步修改密碼失敗"); });
+    }
 
-      fetch(GOOGLE_SHEET_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formData.toString()
-      })
-      .then(res => res.json())
-      .then(data => {
-        showLoading(false);
-        if(data.status === "success") {
-          currentUser = { account: data.account, name: data.name };
-          localStorage.setItem('occ_user', JSON.stringify(currentUser));
-          showMainApp();
-        } else { alert(data.message); }
-      })
-      .catch(err => { 
-        showLoading(false); 
-        console.error(err);
-        alert("連線 Sheet 失敗！請檢查前端程式碼中的 GAS API 網址是否正確。"); 
-      });
-    }
+    // ===== 日曆 =====
+    function initCalendar() {
+      const calEl = document.getElementById('calendar'); if (!calEl) return;
+      calendar = new FullCalendar.Calendar(calEl, {
+        initialView: 'dayGridMonth', locale: 'zh-tw', height: 'auto',
+        headerToolbar: { left: 'prev,title,next', center: '', right: 'today' },
+        dateClick: function(info) { openDayDetail(info.dateStr); },
+        dayCellDidMount: function(info) {
+          const matched = mockDb.filter(d => d.date === info.dateStr);
+          if (matched.length > 0) {
+            let container = info.el.querySelector('.fc-daygrid-day-events') || info.el;
+            let html = '<div class="fc-event-container">';
+            matched.forEach(lv => { html += `<div class="occ-leave-label">${lv.name}</div>`; });
+            html += '</div>'; container.insertAdjacentHTML('beforeend', html);
+          }
+        }
+      });
+      calendar.render();
+    }
 
-    function handleLogout() { localStorage.clear(); window.location.reload(); }
+    // ===== 需求1：點日期 -> 當天請假名單 + 登記請假按鈕 =====
+    function openDayDetail(dateStr) {
+      currentDayDetailDate = dateStr;
+      document.getElementById('dayDetailTitle').innerText = `${dateStr} 請假名單`;
+      const list = mockDb.filter(d => d.date === dateStr);
+      const box = document.getElementById('dayDetailList');
+      if (list.length === 0) {
+        box.innerHTML = "<p class='text-muted text-center py-2 small'>這天目前沒有人請假</p>";
+      } else {
+        let html = '';
+        list.forEach(item => {
+          const canManage = currentUser && item.name === currentUser.name;
+          html += `<div class="leave-item-row">
+            <div><strong>${item.name}</strong><br><span class="text-secondary small">${item.start}~${item.end} | ${item.memo || ''}</span></div>
+            ${canManage ? `<div class="leave-item-actions">
+              <button class="edit-btn" onclick='openQuickLeaveModal("${item.date}", ${JSON.stringify(item).replace(/'/g,"&#39;")})'><i class="fa-solid fa-pen"></i></button>
+              <button class="del-btn" onclick="deleteLeaveById('${item.id}')"><i class="fa-solid fa-trash"></i></button>
+            </div>` : ''}
+          </div>`;
+        });
+        box.innerHTML = html;
+      }
+      new bootstrap.Modal(document.getElementById('dayDetailModal')).show();
+    }
 
+    function openQuickLeaveModalFromDay() {
+      openQuickLeaveModal(currentDayDetailDate, null);
+    }
 
-    function submitChangePassword() {
-      const oldPwd = document.getElementById('pwd-old').value;
-      const n1 = document.getElementById('pwd-new').value;
-      const n2 = document.getElementById('pwd-confirm').value;
-      if(!oldPwd || !n1 || !n2) { alert('請填寫所有欄位'); return; }
-      if(n1 !== n2) { alert('兩次新密碼不符'); return; }
+    // existingEntry 有值代表編輯模式
+    function openQuickLeaveModal(dateStr, existingEntry) {
+      editingLeaveId = existingEntry ? existingEntry.id : null;
+      document.getElementById('quick-date-display').innerText = dateStr;
+      document.getElementById('q-leave-memo').value = existingEntry ? (existingEntry.memo || '') : '';
 
-      showLoading(true);
+      if (existingEntry && existingEntry.start !== '08:00') {
+        setQuickLeaveType('custom');
+        setWheelValueDisplay('q-picker-sh', existingEntry.start.split(':')[0]);
+        setWheelValueDisplay('q-picker-sm', existingEntry.start.split(':')[1]);
+        setWheelValueDisplay('q-picker-eh', existingEntry.end.split(':')[0]);
+        setWheelValueDisplay('q-picker-em', existingEntry.end.split(':')[1]);
+      } else {
+        setQuickLeaveType('full');
+      }
 
-      const formData = new URLSearchParams();
-      formData.append('action', 'changePassword');
-      formData.append('account', currentUser.account);
-      formData.append('oldPassword', oldPwd);
-      formData.append('newPassword', n1);
+      const dayModalEl = document.getElementById('dayDetailModal');
+      const dayModal = bootstrap.Modal.getInstance(dayModalEl);
+      if (dayModal) dayModal.hide();
+      new bootstrap.Modal(document.getElementById('quickLeaveModal')).show();
+    }
 
-      fetch(GOOGLE_SHEET_API, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formData.toString()
-      })
-      .then(res => res.json())
-      .then(data => {
-        showLoading(false);
-        if(data.status === "success") {
-          alert("密碼已成功在 Google Sheet 內更新！");
-          bootstrap.Modal.getInstance(document.getElementById('changePasswordModal')).hide();
-        } else { alert(data.message); }
-      })
-      .catch((err) => { 
-        showLoading(false); 
-        console.error(err);
-        alert("同步修改密碼失敗"); 
-      });
-    }
+    function setQuickLeaveType(type) {
+      selectedQuickLeaveType = type;
+      document.getElementById('q-btn-time-full').classList.toggle('active', type === 'full');
+      document.getElementById('q-btn-time-custom').classList.toggle('active', type === 'custom');
+      document.getElementById('q-ios-time-picker-block').style.display = (type === 'custom') ? 'block' : 'none';
+    }
 
-    function initCalendar() {
-      const calEl = document.getElementById('calendar'); if (!calEl) return;
-      calendar = new FullCalendar.Calendar(calEl, {
-        initialView: 'dayGridMonth', locale: 'zh-tw', height: 'auto',
-        headerToolbar: { left: 'prev,title,next', center: '', right: 'today' },
-        dayCellDidMount: function(info) {
-          const matched = mockDb.filter(d => d.date === info.dateStr);
-          if (matched.length > 0) {
-            let container = info.el.querySelector('.fc-daygrid-day-events') || info.el;
-            let html = '<div class="fc-event-container">';
-            matched.forEach(lv => { html += `<div class="occ-leave-label">${lv.name}</div>`; });
-            html += '</div>'; container.insertAdjacentHTML('beforeend', html);
-          }
-        }
-      });
-      calendar.render();
-    }
+    function submitQuickLeave() {
+      if (!currentDayDetailDate && !editingLeaveId) { alert('日期錯誤'); return; }
+      const dateVal = document.getElementById('quick-date-display').innerText;
+      const memoVal = document.getElementById('q-leave-memo').value.trim();
+      let startTime = "08:00", endTime = "17:00";
+      if (selectedQuickLeaveType === 'custom') {
+        startTime = `${getWheelValue('q-picker-sh')}:${getWheelValue('q-picker-sm')}`;
+        endTime = `${getWheelValue('q-picker-eh')}:${getWheelValue('q-picker-em')}`;
+      }
+      const payload = { name: currentUser.name, date: dateVal, start: startTime, end: endTime, memo: memoVal || "無", applicant: currentUser.name };
+      showLoading(true);
+      const action = editingLeaveId ? 'updateLeave' : 'submitLeave';
+      const formData = new URLSearchParams();
+      formData.append('action', action);
+      if (editingLeaveId) formData.append('id', editingLeaveId);
+      for (const k in payload) formData.append(k, payload[k]);
 
-    function autoCloseDatePicker() {
-      const start = document.getElementById('leave-start-date');
-      if(start.value) { document.getElementById('leave-end-date').value = start.value; start.blur(); }
-    }
+      fetch(GOOGLE_SHEET_API, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
+        .then(res => res.json())
+        .then(async () => {
+          showLoading(false);
+          bootstrap.Modal.getInstance(document.getElementById('quickLeaveModal')).hide();
+          editingLeaveId = null;
+          await fetchAllLeaves();
+          alert("已同步寫入 Google Sheet！");
+        })
+        .catch(err => { showLoading(false); console.error(err); alert("寫入失敗"); });
+    }
 
-    function setLeaveType(type) {
-      selectedLeaveType = type;
-      document.getElementById('btn-time-full').classList.toggle('active', type === 'full');
-      document.getElementById('btn-time-custom').classList.toggle('active', type === 'custom');
-      document.getElementById('ios-time-picker-block').style.display = (type === 'custom') ? 'block' : 'none';
-    }
+    // ===== 需求4：刪除（共用：日曆彈窗 / 我的請假清單皆可呼叫） =====
+    function deleteLeaveById(id) {
+      if (!confirm('確定要刪除這筆請假紀錄嗎？')) return;
+      showLoading(true);
+      const formData = new URLSearchParams();
+      formData.append('action', 'deleteLeave'); formData.append('id', id);
+      fetch(GOOGLE_SHEET_API, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
+        .then(res => res.json())
+        .then(async () => {
+          showLoading(false);
+          const dayModalEl = document.getElementById('dayDetailModal');
+          const dayModalInst = bootstrap.Modal.getInstance(dayModalEl);
+          if (dayModalInst) dayModalInst.hide();
+          await fetchAllLeaves();
+        })
+        .catch(err => { showLoading(false); console.error(err); alert("刪除失敗"); });
+    }
 
-    function submitLeave() {
-      const dVal = document.getElementById('leave-start-date').value;
-      const memoVal = document.getElementById('leave-memo').value.trim();
-      if(!dVal) { alert('請選取日期'); return; }
+    // ===== 需求3：預定請假（多日區間） =====
+    function setLeaveType(type) {
+      selectedLeaveType = type;
+      document.getElementById('btn-time-full').classList.toggle('active', type === 'full');
+      document.getElementById('btn-time-custom').classList.toggle('active', type === 'custom');
+      document.getElementById('ios-time-picker-block').style.display = (type === 'custom') ? 'block' : 'none';
+    }
 
-      let startTime = "08:00", endTime = "17:00";
-      if(selectedLeaveType === 'custom') {
-        startTime = `${getWheelValue('picker-sh')}:${getWheelValue('picker-sm')}`;
-        endTime = `${getWheelValue('picker-eh')}:${getWheelValue('picker-em')}`;
-      }
+    // 需求5：拿掉「勾勾/確認」按鈕，改成日期輸入框 change 事件自動關閉/跳轉
+    function bindDateAutoClose() {
+      const start = document.getElementById('leave-start-date');
+      const end = document.getElementById('leave-end-date');
+      start.addEventListener('change', () => {
+        if (start.value) {
+          if (!end.value || end.value < start.value) end.value = start.value;
+          start.blur();
+        }
+      });
+      end.addEventListener('change', () => { if (end.value) end.blur(); });
+    }
 
-      const postObj = {
-        action: "submitLeave", name: currentUser.name, date: dVal,
-        start: startTime, end: endTime, memo: memoVal || "無", applicant: currentUser.name
-      };
+    function submitReserveForm() {
+      const startVal = document.getElementById('leave-start-date').value;
+      const endVal = document.getElementById('leave-end-date').value || startVal;
+      const memoVal = document.getElementById('leave-memo').value.trim();
+      if (!startVal) { alert('請選取日期'); return; }
 
-      mockDb.push(postObj); 
+      let startTime = "08:00", endTime = "17:00";
+      if (selectedLeaveType === 'custom') {
+        startTime = `${getWheelValue('picker-sh')}:${getWheelValue('picker-sm')}`;
+        endTime = `${getWheelValue('picker-eh')}:${getWheelValue('picker-em')}`;
+      }
 
-      showLoading(true);
+      showLoading(true);
 
-      const formData = new URLSearchParams();
-      for (const key in postObj) { formData.append(key, postObj[key]); }
+      if (editingLeaveId) {
+        // 編輯模式：只更新單一日期那一筆
+        const formData = new URLSearchParams();
+        formData.append('action', 'updateLeave'); formData.append('id', editingLeaveId);
+        formData.append('name', currentUser.name); formData.append('date', startVal);
+        formData.append('start', startTime); formData.append('end', endTime);
+        formData.append('memo', memoVal || "無");
+        fetch(GOOGLE_SHEET_API, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
+          .then(res => res.json())
+          .then(async () => {
+            showLoading(false);
+            alert("已更新請假紀錄！");
+            cancelEditReserve();
+            await fetchAllLeaves();
+            switchTab('mytrips', null);
+          })
+          .catch(err => { showLoading(false); console.error(err); alert("更新失敗"); });
+        return;
+      }
 
-      fetch(GOOGLE_SHEET_API, { 
-        method: 'POST', 
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: formData.toString() 
-      })
-      .then(res => res.json())
-      .then(() => { 
-        showLoading(false); 
-        alert("已同步寫入 Google Sheet！"); 
-        resetLeaveForm(); 
-      })
-      .catch((err) => { 
-        showLoading(false); 
-        console.error(err);
-        alert("寫入失敗，但已存在本機臨時紀錄中。"); 
-        resetLeaveForm(); 
-      });
-    }
+      // 新增模式：依日期區間逐日送出
+      const dates = getDateRange(startVal, endVal);
+      const requests = dates.map(d => {
+        const formData = new URLSearchParams();
+        formData.append('action', 'submitLeave');
+        formData.append('name', currentUser.name); formData.append('date', d);
+        formData.append('start', startTime); formData.append('end', endTime);
+        formData.append('memo', memoVal || "無"); formData.append('applicant', currentUser.name);
+        return fetch(GOOGLE_SHEET_API, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() });
+      });
 
-    function resetLeaveForm() {
-      document.getElementById('leave-start-date').value = ""; document.getElementById('leave-memo').value = "";
-      if(calendar) calendar.render(); handleTopFilter('day'); switchTab('home', null);
-    }
+      Promise.all(requests)
+        .then(async () => {
+          showLoading(false);
+          alert(`已同步寫入 Google Sheet！(共 ${dates.length} 天)`);
+          resetLeaveForm();
+          await fetchAllLeaves();
+        })
+        .catch(err => { showLoading(false); console.error(err); alert("寫入失敗，請重試"); });
+    }
 
-    function handleTopFilter(mode) {
-      currentActiveFilter = mode;
-      document.querySelectorAll('.top-filter-btn').forEach(b => b.classList.remove('active'));
-      if(document.getElementById(`filter-btn-${mode}`)) document.getElementById(`filter-btn-${mode}`).classList.add('active');
-      const wBox = document.getElementById('dynamic-wheel-box');
-      if(mode === 'seluser') { wBox.style.display = 'block'; } 
-      else { if(wBox) wBox.style.display = 'none'; renderOverviewList(mode); }
-    }
+    function resetLeaveForm() {
+      document.getElementById('leave-start-date').value = "";
+      document.getElementById('leave-end-date').value = "";
+      document.getElementById('leave-memo').value = "";
+      setLeaveType('full');
+      if (calendar) calendar.render();
+      switchTab('home', null);
+    }
 
-    function executeSearchFromWheel() { renderOverviewList(currentActiveFilter); }
+    function cancelEditReserve() {
+      editingLeaveId = null;
+      document.getElementById('reserve-form-title').innerText = '填寫請假申請';
+      document.getElementById('reserve-submit-btn').innerText = '送出預定';
+      document.getElementById('reserve-cancel-btn').style.display = 'none';
+      document.getElementById('leave-end-date').disabled = false;
+      resetLeaveForm();
+    }
 
-    function renderOverviewList(mode) {
-      const container = document.getElementById('all-leaves-list'); if (!container) return;
-      const todayStr = "2026-06-23"; const thisMonthStr = "2026-06";
-      let filtered = []; let title = "";
+    // ===== 需求4：我的請假清單（含編輯/刪除） =====
+    function renderMyTrips() {
+      const container = document.getElementById('my-leaves-list'); if (!container) return;
+      if (!currentUser) return;
+      const mine = mockDb.filter(d => d.name === currentUser.name).sort((a,b) => a.date < b.date ? 1 : -1);
+      if (mine.length === 0) { container.innerHTML = "<p class='text-muted text-center py-3 small'>目前沒有請假紀錄</p>"; return; }
+      let html = '';
+      mine.forEach(item => {
+        html += `<div class="leave-item-row">
+          <div><strong>${item.date}</strong><br><span class="text-secondary small">${item.start}~${item.end} | ${item.memo || ''}</span></div>
+          <div class="leave-item-actions">
+            <button class="edit-btn" onclick='editFromMyTrips(${JSON.stringify(item).replace(/'/g,"&#39;")})'><i class="fa-solid fa-pen"></i></button>
+            <button class="del-btn" onclick="deleteLeaveById('${item.id}')"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </div>`;
+      });
+      container.innerHTML = html;
+    }
 
-      if(mode === 'day') { filtered = mockDb.filter(d => d.date === todayStr); title = `<h6>今日 (${todayStr}) 紀錄：</h6>`; }
-      else if(mode === 'month') { filtered = mockDb.filter(d => d.date.startsWith(thisMonthStr)); title = `<h6>本月 (${thisMonthStr}) 紀錄：</h6>`; }
-      else if(mode === 'seluser') { const u = getWheelValue('picker-ov-user'); filtered = mockDb.filter(d => d.name === u); title = `<h6>同仁 (${u}) 查詢結果：</h6>`; }
+    function editFromMyTrips(item) {
+      editingLeaveId = item.id;
+      document.getElementById('reserve-form-title').innerText = '編輯請假紀錄';
+      document.getElementById('reserve-submit-btn').innerText = '更新請假';
+      document.getElementById('reserve-cancel-btn').style.display = 'block';
+      document.getElementById('leave-start-date').value = item.date;
+      document.getElementById('leave-end-date').value = item.date;
+      document.getElementById('leave-end-date').disabled = true; // 編輯模式僅能改單日
+      document.getElementById('leave-memo').value = item.memo || '';
+      if (item.start !== '08:00') {
+        setLeaveType('custom');
+        setWheelValueDisplay('picker-sh', item.start.split(':')[0]);
+        setWheelValueDisplay('picker-sm', item.start.split(':')[1]);
+        setWheelValueDisplay('picker-eh', item.end.split(':')[0]);
+        setWheelValueDisplay('picker-em', item.end.split(':')[1]);
+      } else {
+        setLeaveType('full');
+      }
+      switchTab('reserve', null);
+    }
 
-      if(filtered.length === 0) { container.innerHTML = title + "<p class='text-muted text-center py-3 small'>無請假紀錄</p>"; } 
-      else {
-        let html = title;
-        filtered.forEach(x => {
-          html += `<div class='p-2 mb-2 border-bottom small'><strong>${x.name}</strong> (${x.date})<br><span class='text-secondary'>${x.start}~${x.end} | ${x.memo}</span></div>`;
-        });
-        container.innerHTML = html;
-      }
-    }
+    // ===== 需求2：單位總覽 =====
+    function handleTopFilter(mode) {
+      currentActiveFilter = mode;
+      document.querySelectorAll('.top-filter-btn').forEach(b => b.classList.remove('active'));
+      if (document.getElementById(`filter-btn-${mode}`)) document.getElementById(`filter-btn-${mode}`).classList.add('active');
 
-    function switchTab(id, btn) {
-        // 1. 切換顯示區塊
-        document.querySelectorAll('.app-section').forEach(s => s.classList.remove('active'));
-        document.querySelectorAll('.footer-item').forEach(b => b.classList.remove('active'));
-  
-        const targetSection = document.getElementById(`sect-${id}`);
-        targetSection.classList.add('active');
-  
-        if(btn) btn.classList.add('active');
-  
-        // 2. 若切換回首頁，強制更新日曆尺寸
-        if(id === 'home' && calendar) {
-            // 必須給瀏覽器一點時間完成顯示，再重算
-            setTimeout(() => {
-                calendar.updateSize();
-                calendar.render();
-            }, 100); // 延長至 100ms 確保 DOM 已完全顯示
-        }
-    }
+      document.getElementById('custommonth-box').style.display = 'none';
+      document.getElementById('dynamic-wheel-box').style.display = 'none';
 
+      if (mode === 'custommonth') {
+        document.getElementById('custommonth-box').style.display = 'block';
+        renderOverviewList('custommonth');
+      } else if (mode === 'seluser') {
+        document.getElementById('dynamic-wheel-box').style.display = 'block';
+        renderOverviewList('seluser');
+      } else {
+        renderOverviewList(mode);
+      }
+    }
 
-    function initLazyPickers() {
-      if (pickersInitialized) return;
-      
-      const fill = (id, max) => {
-        const el = document.getElementById(id); if(!el) return;
-        el.innerHTML = "<div style='height:36px;'></div>"; 
-        
-        for(let i=0; i<max; i++) {
-          let v = i<10?'0'+i:''+i; 
-          let item = document.createElement('div');
-          item.className = 'ios-picker-item' + (i === 0 ? ' selected' : ''); 
-          item.innerText = v; 
-          el.appendChild(item);
-        }
-        
-        let pad = document.createElement('div'); pad.style.height = '36px'; el.appendChild(pad);
-        
-        el.addEventListener('scroll', () => {
-          clearTimeout(el.t); el.t = setTimeout(() => {
-            const idx = Math.round(el.scrollTop / 36) + 1;
-            Array.from(el.children).forEach(c => c.classList.remove('selected'));
-            if(el.children[idx]) el.children[idx].classList.add('selected');
-          }, 60);
-        });
-      };
-      
-      fill('picker-sh', 24); fill('picker-sm', 60); fill('picker-eh', 24); fill('picker-em', 60);
-      
-      const uEl = document.getElementById('picker-ov-user');
-      if(uEl) {
-        uEl.innerHTML = "<div style='height:36px;'></div>";
-        userList.forEach((u, i) => { 
-          let item = document.createElement('div'); 
-          item.className='ios-picker-item' + (i === 0 ? ' selected' : ''); 
-          item.innerText=u; 
-          uEl.appendChild(item); 
-        });
-        let pad = document.createElement('div'); pad.style.height = '36px'; uEl.appendChild(pad);
-        
-        uEl.addEventListener('scroll', () => {
-          clearTimeout(uEl.t); uEl.t = setTimeout(() => {
-            const idx = Math.round(uEl.scrollTop / 36) + 1;
-            Array.from(uEl.children).forEach(c => c.classList.remove('selected'));
-            if(uEl.children[idx]) uEl.children[idx].classList.add('selected');
-          }, 60);
-        });
-      }
-      pickersInitialized = true;
-    }
+    function executeSearchFromWheel() { renderOverviewList('seluser'); }
 
-    function getWheelValue(id) { 
-      const el = document.getElementById(id); 
-      const sel = el ? el.querySelector('.selected') : null; 
-      return sel ? sel.innerText : (el && el.children[1] ? el.children[1].innerText : "00"); 
-    }
-    
-    function showLoading(show) { document.getElementById('loading-spinner').style.display = show ? 'flex' : 'none'; }
-    function openChangePasswordModal() { new bootstrap.Modal(document.getElementById('changePasswordModal')).show(); }
-  </script>
+    function renderOverviewList(mode) {
+      const container = document.getElementById('all-leaves-list'); if (!container) return;
+      const tStr = todayStr(); const mStr = thisMonthStr();
+      let filtered = []; let title = "";
+
+      if (mode === 'day') { filtered = mockDb.filter(d => d.date === tStr); title = `<h6>今日 (${tStr}) 紀錄：</h6>`; }
+      else if (mode === 'month') { filtered = mockDb.filter(d => d.date.startsWith(mStr)); title = `<h6>本月 (${mStr}) 紀錄：</h6>`; }
+      else if (mode === 'custommonth') {
+        const v = document.getElementById('overview-month-input').value;
+        if (!v) { container.innerHTML = "<p class='text-muted text-center py-3 small'>請先選擇月份</p>"; return; }
+        filtered = mockDb.filter(d => d.date.startsWith(v)); title = `<h6>${v} 紀錄：</h6>`;
+      }
+      else if (mode === 'seluser') {
+        const u = getWheelValue('picker-ov-user');
+        filtered = mockDb.filter(d => d.name === u); title = `<h6>同仁 (${u}) 查詢結果：</h6>`;
+      }
+
+      if (filtered.length === 0) { container.innerHTML = title + "<p class='text-muted text-center py-3 small'>無請假紀錄</p>"; }
+      else {
+        let html = title;
+        filtered.sort((a,b) => a.date < b.date ? -1 : 1).forEach(x => {
+          html += `<div class='p-2 mb-2 border-bottom small'><strong>${x.name}</strong> (${x.date})<br><span class='text-secondary'>${x.start}~${x.end} | ${x.memo}</span></div>`;
+        });
+        container.innerHTML = html;
+      }
+    }
+
+    // ===== 分頁切換 =====
+    function switchTab(id, btn) {
+      document.querySelectorAll('.app-section').forEach(s => s.classList.remove('active'));
+      document.querySelectorAll('.footer-item').forEach(b => b.classList.remove('active'));
+      const targetSection = document.getElementById(`sect-${id}`);
+      targetSection.classList.add('active');
+
+      if (btn) { btn.classList.add('active'); }
+      else {
+        const map = { home: 0, reserve: 1, mytrips: 2, overview: 3 };
+        const items = document.querySelectorAll('.footer-item');
+        if (map[id] !== undefined && items[map[id]]) items[map[id]].classList.add('active');
+      }
+
+      if (id === 'home' && calendar) {
+        setTimeout(() => { calendar.updateSize(); calendar.render(); }, 100);
+      }
+      if (id === 'mytrips') { renderMyTrips(); }
+      if (id === 'overview') { renderOverviewList(currentActiveFilter); }
+      if (id !== 'reserve' && editingLeaveId) { cancelEditReserve(); }
+    }
+
+    // ===== 滾輪選取器 =====
+    function initLazyPickers() {
+      if (pickersInitialized) return;
+      const fill = (id, max) => {
+        const el = document.getElementById(id); if (!el) return;
+        el.innerHTML = "<div style='height:36px;'></div>";
+        for (let i = 0; i < max; i++) {
+          let v = i < 10 ? '0'+i : ''+i;
+          let item = document.createElement('div');
+          item.className = 'ios-picker-item' + (i === 0 ? ' selected' : '');
+          item.innerText = v;
+          el.appendChild(item);
+        }
+        let pad = document.createElement('div'); pad.style.height = '36px'; el.appendChild(pad);
+        el.addEventListener('scroll', () => {
+          clearTimeout(el.t); el.t = setTimeout(() => {
+            const idx = Math.round(el.scrollTop / 36) + 1;
+            Array.from(el.children).forEach(c => c.classList.remove('selected'));
+            if (el.children[idx]) el.children[idx].classList.add('selected');
+          }, 60);
+        });
+      };
+      fill('picker-sh', 24); fill('picker-sm', 60); fill('picker-eh', 24); fill('picker-em', 60);
+      fill('q-picker-sh', 24); fill('q-picker-sm', 60); fill('q-picker-eh', 24); fill('q-picker-em', 60);
+
+      fillUserPicker();
+      pickersInitialized = true;
+    }
+
+    function fillUserPicker() {
+      const uEl = document.getElementById('picker-ov-user');
+      if (!uEl) return;
+      uEl.innerHTML = "<div style='height:36px;'></div>";
+      userList.forEach((u, i) => {
+        let item = document.createElement('div');
+        item.className = 'ios-picker-item' + (i === 0 ? ' selected' : '');
+        item.innerText = u;
+        uEl.appendChild(item);
+      });
+      let pad = document.createElement('div'); pad.style.height = '36px'; uEl.appendChild(pad);
+      uEl.addEventListener('scroll', () => {
+        clearTimeout(uEl.t); uEl.t = setTimeout(() => {
+          const idx = Math.round(uEl.scrollTop / 36) + 1;
+          Array.from(uEl.children).forEach(c => c.classList.remove('selected'));
+          if (uEl.children[idx]) uEl.children[idx].classList.add('selected');
+        }, 60);
+      });
+    }
+
+    function getWheelValue(id) {
+      const el = document.getElementById(id);
+      const sel = el ? el.querySelector('.selected') : null;
+      return sel ? sel.innerText : (el && el.children[1] ? el.children[1].innerText : "00");
+    }
+
+    // 直接設定滾輪目前選中值（用於編輯既有紀錄時回填）
+    function setWheelValueDisplay(id, value) {
+      const el = document.getElementById(id); if (!el) return;
+      const target = Array.from(el.children).find(c => c.innerText === value || c.innerText === String(parseInt(value)).padStart(2,'0'));
+      if (!target) return;
+      Array.from(el.children).forEach(c => c.classList.remove('selected'));
+      target.classList.add('selected');
+      el.scrollTop = target.offsetTop - 36;
+    }
+
+    function showLoading(show) { document.getElementById('loading-spinner').style.display = show ? 'flex' : 'none'; }
+    function openChangePasswordModal() { new bootstrap.Modal(document.getElementById('changePasswordModal')).show(); }
+  </script>
 </body>
 </html>
