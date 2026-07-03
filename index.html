@@ -229,86 +229,53 @@
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
 
   <script>
-    // 1. 全域變數定義區 (非常重要，必須放在所有函式之前)
-    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbxV2lHxwivzDP2yMBjPQ-2JuMMF2Z98g-uUoBqzgcchI3LfA9YfLI53Zs0DXL5zxPjK5Q/exec"; 
+    // 1. 全域變數定義區 (唯一入口)
+    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbzStRjTomCj7sx6S83siZj_A6_i9KZEbo8Q0YRrnafTnqiWNBievmIWFYfn_T1RwT64EA/exec"; 
     let calendar = null;
     let currentUser = null;
     let selectedLeaveType = 'full';
     let currentActiveFilter = 'day';
     let pickersInitialized = false;
-    let mockDb = []; // 務必初始化為空陣列
-    let userList = ["同仁A", "同仁B", "同仁C"]; // 請填入實際的同仁名單
+    let mockDb = []; 
+    let userList = []; 
 
-    // 2. 確保頁面載入時先執行登入檢查
-    document.addEventListener("DOMContentLoaded", function() {
-      checkLoginState();
-      // 延遲初始化其他元件
-      setTimeout(() => {
-          try { initLazyPickers(); } catch (e) { console.error(e); }
-      }, 500);
+    // 2. 統一的初始化入口
+    document.addEventListener("DOMContentLoaded", async function() {
+        console.log("系統初始化...");
+        checkLoginState();
+        
+        // 初始化選取器
+        try { initLazyPickers(); } catch (e) { console.error("選取器載入失敗", e); }
+
+        // 如果已登入，則載入資料
+        if (currentUser) {
+            await fetchAllLeaves();
+        }
     });
 
-    // 🎯 填入最新 URL
-    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbxV2lHxwivzDP2yMBjPQ-2JuMMF2Z98g-uUoBqzgcchI3LfA9YfLI53Zs0DXL5zxPjK5Q/exec"; 
+    // 取得資料 (修正後的穩定版)
+    async function fetchAllLeaves() {
+        showLoading(true);
+        try {
+            const res = await fetch(GOOGLE_SHEET_API + "?action=getData");
+            mockDb = await res.json();
+            if(calendar) calendar.render(); 
+        } catch (err) {
+            console.error("資料載入失敗", err);
+        } finally {
+            showLoading(false);
+        }
+    }
 
-    // 初始化必要變數，避免 ReferenceError
-    let calendar = null;
-    let currentUser = null;
-    let selectedLeaveType = 'full';
-    let currentActiveFilter = 'day';
-    let pickersInitialized = false;
-    let realData = [];
-    let mockDb = []; // 初始化空陣列
-    let userList = ["同仁A", "同仁B", "同仁C"]; // 請在這裡加入您的同仁名單
-
-    // 確保 fetchAllLeaves 在頁面載入時被呼叫
-    function fetchAllLeaves() {
-      showLoading(true);
-      fetch(GOOGLE_SHEET_API + "?action=getData")
-        .then(res => res.json())
-        .then(data => {
-          realData = data;
-          mockDb = data; // 同步資料
-          showLoading(false);
-          if(calendar) calendar.render(); 
-        })
-        .catch(err => {
-          showLoading(false);
-          console.error("抓取資料失敗", err);
-        });
-    }
-    
-    // 將原本的 DOMContentLoaded 替換為以下邏輯
-    document.addEventListener("DOMContentLoaded", function() {
-      console.log("頁面載入中...");
-  
-      // 1. 先顯示登入狀態檢查
-      checkLoginState();
-  
-      // 2. 只有在登入後才進行 Calendar 初始化，避免崩潰
-      try {
-        initLazyPickers();
-      } catch (e) {
-        console.error("初始化選取器失敗:", e);
-      }
-    });
-
-    // 統一的 showMainApp 函式
+    // 統一的 showMainApp
     function showMainApp() {
-      document.getElementById('section-login').style.display = 'none';
-      document.getElementById('main-application').style.display = 'block';
-      document.getElementById('user-greeting').innerText = currentUser.name;
-      
-      // 管理員徽章判斷
-      if(currentUser.account.toLowerCase() === "h74290" || currentUser.name === "怡君") {
-        document.getElementById('admin-shield').style.display = 'inline-block';
-      }
-      
-      // 延遲初始化日曆
-      setTimeout(() => { 
-          if(typeof initCalendar === 'function') initCalendar(); 
-          if(typeof handleTopFilter === 'function') handleTopFilter('day');
-      }, 300);
+        document.getElementById('section-login').style.display = 'none';
+        document.getElementById('main-application').style.display = 'block';
+        document.getElementById('user-greeting').innerText = currentUser ? currentUser.name : '同仁';
+        
+        setTimeout(() => { 
+            if(typeof initCalendar === 'function') initCalendar(); 
+        }, 300);
     }
   
 
