@@ -33,11 +33,36 @@
       box-shadow: 0 10px 30px rgba(17, 75, 95, 0.08);
       padding: 40px 30px; width: 100%; max-width: 90%; text-align: center;
     }
-    .login-logo-box {
-      width: 100%; height: 160px; display: flex; align-items: center; justify-content: center; margin-bottom: 25px; overflow: hidden;
+    .login-page-bg {
+    min-height: 100vh;
+    display: flex;
+    align-items: center; 
+    justify-content: center;
+    padding: 10px; /* 縮減間距 */
+    background: linear-gradient(180deg, #B9E3F8 0%, #FFFFFF 100%);
     }
+
+    .login-card-custom {
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 24px;
+        padding: 20px;
+        width: 100%;
+        max-width: 400px; /* 限制最大寬度 */
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+
+    .login-logo-box {
+        width: 100%;
+        height: auto; /* 移除固定高度 */
+        display: flex;
+        justify-content: center;
+        margin-bottom: 15px;
+    }
+
     .login-logo-box img {
-      width: 260px; height: 260px; object-fit: contain; margin-top: -10px;
+        width: 150px; /* 直接縮小圖片 */
+        height: auto;
+        object-fit: contain;
     }
     .login-btn-gradient {
       background: linear-gradient(90deg, #79C2E6 0%, #F4BD93 100%);
