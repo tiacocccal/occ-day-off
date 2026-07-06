@@ -10,7 +10,7 @@
   <meta name="theme-color" content="#114B5F">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <style>
     :root {
       --pantone-turquoise: #00A896;
@@ -129,7 +129,7 @@
     <div class="occ-navbar">
       <div class="navbar-brand-box" id="nav-brand-box">
         <img src="logo.png" alt="logo">
-        <span>OCC 休假表</span>
+        <span><i class="fa-solid fa-plane"></i> OCC 休假表</span>
       </div>
       <div>
         <button class="btn btn-sm btn-outline-light me-1" onclick="openChangePasswordModal()">改密碼</button>
@@ -138,11 +138,12 @@
     </div>
     <div class="status-bar">
       <div class="user-greeting-box">
-        HELLO <span id="user-greeting">同仁</span>
-        <span class="admin-badge" id="admin-shield" style="display:none;">🛡️ 管理員模式</span>
+        <i class="fa-solid fa-plane"></i> HELLO <span id="user-greeting">同仁</span>
+        <span class="admin-badge" id="admin-shield" style="display:none;"><i class="fa-solid fa-user-gear"></i> 管理員模式</span>
       </div>
-      <div class="info-tip">💡 點選日期查看詳情</div>
+      <div class="info-tip" id="home-info-tip"><i class="fa-solid fa-lightbulb" style="color: rgb(255, 212, 59);"></i> 點選日期查看詳情</div>
     </div>
+    #home-info-tip { display: none; }
 
     <div class="container-fluid calendar-container">
 
@@ -155,7 +156,7 @@
           <h5 class="mb-3 fw-bold" style="color:var(--pantone-navy);"><i class="fa-solid fa-calendar-check me-2"></i><span id="reserve-form-title">填寫請假申請</span></h5>
 
           <div id="reserve-delegate-box" class="delegate-box" style="display:none;">
-            <label class="small text-secondary mb-1 d-block fw-bold"><i class="fa-solid fa-user-shield me-1"></i>代為申請對象</label>
+            <label class="small text-secondary mb-1 d-block fw-bold"><i class="fa-solid fa-id-badge"></i>代為申請對象</label>
             <select id="reserve-delegate-select" class="form-select form-select-sm"></select>
           </div>
 
@@ -164,7 +165,7 @@
               <label class="small text-secondary mb-1">開始日期</label>
               <input type="date" id="leave-start-date" class="form-control">
             </div>
-            <div class="arrow-col pt-4">➡️</div>
+            <div class="arrow-col pt-4"><i class="fa-solid fa-right-long" style="color: #a2d3ea;"></i></div>
             <div class="date-col">
               <label class="small text-secondary mb-1">結束日期</label>
               <input type="date" id="leave-end-date" class="form-control">
@@ -188,8 +189,8 @@
           </div>
 
           <div class="mb-4">
-            <label class="small text-secondary mb-1">備註事由</label>
-            <textarea id="leave-memo" class="form-control" rows="3" placeholder="請輸入事由(如：特休、公假、事假)"></textarea>
+            <label class="small text-secondary mb-1">事由/備註(選填)</label>
+            <textarea id="leave-memo" class="form-control" rows="3" placeholder="如：公出參訪、度假囉!、心情不美麗、身體不適、王美美會代理我～"></textarea>
           </div>
 
           <button class="btn w-100 py-2 text-white fw-bold" id="reserve-submit-btn" style="background-color: var(--pantone-turquoise); border-radius:12px;" onclick="submitReserveForm()">送出預定</button>
@@ -200,7 +201,7 @@
       <!-- 行程管理 / 我的請假清單 -->
       <div id="sect-mytrips" class="app-section">
         <div class="card-custom">
-          <h5 class="mb-3 fw-bold" style="color:var(--pantone-navy);"><i class="fa-solid fa-clock-rotate-left me-2"></i><span id="mytrips-title">我的請假清單</span></h5>
+          <h5 class="mb-3 fw-bold" style="color:var(--pantone-navy);"><i class="fa-solid fa-list"></i><span id="mytrips-title">我的請假清單</span></h5>
           <div id="my-leaves-list"></div>
         </div>
       </div>
@@ -232,9 +233,9 @@
 
     <div class="occ-footer">
       <button class="footer-item active" onclick="switchTab('home', this)"><i class="fa-solid fa-house"></i>首頁</button>
-      <button class="footer-item" onclick="switchTab('reserve', this)"><i class="fa-solid fa-calendar-plus"></i>預定請假</button>
-      <button class="footer-item" onclick="switchTab('mytrips', this)"><i class="fa-solid fa-route"></i>行程管理</button>
-      <button class="footer-item" onclick="switchTab('overview', this)"><i class="fa-solid fa-users"></i>單位總覽</button>
+      <button class="footer-item" onclick="switchTab('reserve', this)"><i class="fa-solid fa-calendar-check"></i>預定請假</button>
+      <button class="footer-item" onclick="switchTab('mytrips', this)"><i class="fa-solid fa-suitcase"></i>行程管理</button>
+      <button class="footer-item" onclick="switchTab('overview', this)"><i class="fa-solid fa-chart-simple"></i>單位總覽</button>
     </div>
   </div>
 
@@ -247,8 +248,11 @@
         </div>
         <div class="modal-body">
           <div class="mb-3"><label class="small text-secondary">舊密碼</label><input type="password" id="pwd-old" class="form-control"></div>
+          <i class="fa-solid fa-eye password-toggle-icon" id="toggle-password-btn" onclick="togglePasswordVisibility()"></i>
           <div class="mb-3"><label class="small text-secondary">新密碼</label><input type="password" id="pwd-new" class="form-control"></div>
+          <i class="fa-solid fa-eye password-toggle-icon" id="toggle-password-btn" onclick="togglePasswordVisibility()"></i>
           <div class="mb-3"><label class="small text-secondary">再次輸入新密碼</label><input type="password" id="pwd-confirm" class="form-control"></div>
+          <i class="fa-solid fa-eye password-toggle-icon" id="toggle-password-btn" onclick="togglePasswordVisibility()"></i>
           <button class="btn w-100 text-white py-2" style="background: var(--pantone-dark-sea); border-radius:12px;" onclick="submitChangePassword()">確認修改</button>
         </div>
       </div>
@@ -279,7 +283,7 @@
         </div>
         <div class="modal-body">
           <div id="quick-delegate-box" class="delegate-box" style="display:none;">
-            <label class="small text-secondary mb-1 d-block fw-bold"><i class="fa-solid fa-user-shield me-1"></i>代為申請對象</label>
+            <label class="small text-secondary mb-1 d-block fw-bold"><i class="fa-solid fa-person-circle-plus"></i>代為申請對象</label>
             <select id="quick-delegate-select" class="form-select form-select-sm"></select>
           </div>
           <div class="mb-3">
@@ -302,8 +306,8 @@
             </div>
           </div>
           <div class="mb-4">
-            <label class="small text-secondary mb-1">事由 / 備註 (選填)</label>
-            <input type="text" id="q-leave-memo" class="form-control" placeholder="如：事假、王小明代">
+            <label class="small text-secondary mb-1">事由/備註(選填)</label>
+            <input type="text" id="q-leave-memo" class="form-control" placeholder="如：公出參訪、度假囉!、心情不美麗、身體不適、王美美會代理我～">
           </div>
           <button class="btn w-100 py-2 text-white fw-bold" style="background-color: var(--pantone-turquoise); border-radius:12px;" onclick="submitQuickLeave()">確認送出假單</button>
         </div>
@@ -516,8 +520,8 @@
           html += `<div class="leave-item-row">
             <div><strong>${item.name}</strong><br><span class="text-secondary small">${formatDateRangeDisplay(item.startDate, item.endDate)}　${item.start}~${item.end}</span></div>
             ${canManage ? `<div class="leave-item-actions">
-              <button class="edit-btn" onclick='openQuickLeaveModal(null, ${JSON.stringify(item).replace(/'/g,"&#39;")})'><i class="fa-solid fa-pen"></i></button>
-              <button class="del-btn" onclick="deleteLeaveById('${item.id}')"><i class="fa-solid fa-trash"></i></button>
+              <button class="edit-btn" onclick='openQuickLeaveModal(null, ${JSON.stringify(item).replace(/'/g,"&#39;")})'><i class="fa-solid fa-pen-to-square"></i></button>
+              <button class="del-btn" onclick="deleteLeaveById('${item.id}')"><i class="fa-solid fa-trash-can"></i></button>
             </div>` : ''}
           </div>`;
         });
@@ -701,8 +705,8 @@
         html += `<div class="leave-item-row">
           <div><strong>${currentUser.isAdmin ? item.name + '　' : ''}${formatDateRangeDisplay(item.startDate, item.endDate)}</strong><br><span class="text-secondary small">${item.start}~${item.end}${item.memo && item.memo !== '無' ? ' | ' + item.memo : ''}</span></div>
           <div class="leave-item-actions">
-            <button class="edit-btn" onclick='editFromMyTrips(${JSON.stringify(item).replace(/'/g,"&#39;")})'><i class="fa-solid fa-pen"></i></button>
-            <button class="del-btn" onclick="deleteLeaveById('${item.id}')"><i class="fa-solid fa-trash"></i></button>
+            <button class="edit-btn" onclick='editFromMyTrips(${JSON.stringify(item).replace(/'/g,"&#39;")})'><i class="fa-solid fa-pen-to-square"></i></button>
+            <button class="del-btn" onclick="deleteLeaveById('${item.id}')"><i class="fa-solid fa-trash-can"></i></button>
           </div>
         </div>`;
       });
@@ -790,6 +794,13 @@
       if (id === 'mytrips') { renderMyTrips(); }
       if (id === 'overview') { renderOverviewList(currentActiveFilter); }
       if (id !== 'reserve' && editingLeaveId) { cancelEditReserve(); }
+
+      const tip = document.getElementById('home-info-tip');
+      if (id === 'home') {
+          tip.style.display = 'block';
+      } else {
+          tip.style.display = 'none';
+      }
     }
 
     // ===== 滾輪選取器 =====
