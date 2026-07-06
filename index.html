@@ -2,7 +2,7 @@
 <html lang="zh-TW">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title></title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.png">
@@ -21,6 +21,7 @@
       --occ-green-border: #4AA39A;
       --occ-label-bg: #D2EFEA;
     }
+    html, body { height: 100%; }
     body {
       background-color: var(--pantone-light-bg);
       font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
@@ -28,8 +29,9 @@
     }
     /* ===== 登入畫面 ===== */
     .login-page-bg {
-      min-height: 100vh; display: flex; align-items: center; justify-content: center;
-      padding: 20px; background: linear-gradient(180deg, #B9E3F8 0%, #FFFFFF 100%);
+      min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center;
+      padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom)) 20px;
+      background: linear-gradient(180deg, #B9E3F8 0%, #FFFFFF 100%);
     }
     .login-card-custom {
       background: rgba(255, 255, 255, 0.95); border-radius: 24px; padding: 24px;
@@ -59,15 +61,17 @@
     #calendar { width: 100%; max-width: 100%; margin: 0 auto; }
     .fc { width: 100% !important; table-layout: fixed; background: white; border-radius: 24px; padding: 16px 8px; box-shadow: 0 4px 20px rgba(17, 75, 95, 0.04); border: none !important; }
     .fc-theme-standard td, .fc-theme-standard th, .fc-theme-standard .fc-scrollgrid { border: none !important; }
-    .fc-header-toolbar { display: flex !important; flex-wrap: nowrap !important; align-items: center !important; justify-content: space-between !important; margin-bottom: 12px !important; }
-    .fc-toolbar-chunk { display: flex !important; align-items: center !important; gap: 6px; }
-    .fc-toolbar-title { font-size: 20px !important; font-weight: 800; color: var(--pantone-navy); white-space: nowrap; }
-    .fc-button { background: var(--pantone-navy) !important; border: none !important; border-radius: 10px !important; box-shadow: none !important; width: 34px; height: 34px; display:flex; align-items:center; justify-content:center; padding: 0 !important; }
-    .fc-today-button { width: auto !important; padding: 0 14px !important; border-radius: 16px !important; background: white !important; color: var(--pantone-dark-sea) !important; border: 1.5px solid var(--pantone-dark-sea) !important; font-weight: 700; font-size: 13px; text-transform: none; }
-    .fc-today-button:disabled { opacity: 0.5; }
+    /* 自訂月曆標題列：箭頭與年月標題強制同一排，切換鈕改用淺色 */
+    .custom-cal-header { display: flex; align-items: center; gap: 8px; padding: 4px 6px 14px 6px; }
+    .cal-nav-btn { width: 32px; height: 32px; flex-shrink: 0; border-radius: 50%; border: none; background: #eaf3f3; color: var(--pantone-navy); font-size: 13px; display: flex; align-items: center; justify-content: center; }
+    .cal-nav-btn:active { background: #d9ecec; }
+    .cal-title { font-size: 19px; font-weight: 800; color: var(--pantone-navy); white-space: nowrap; }
+    .cal-today-btn { margin-left: auto; padding: 6px 14px; border-radius: 16px; background: white; color: var(--pantone-dark-sea); border: 1.5px solid var(--pantone-dark-sea); font-weight: 700; font-size: 13px; }
+    .fc-col-header-cell-cushion { text-decoration: none !important; color: var(--pantone-navy) !important; pointer-events: none; font-weight: 600; }
     .fc-daygrid-day-frame { border-radius: 14px; margin: 2px; }
     .fc-daygrid-day-top { justify-content: center; padding-top: 4px; }
-    .fc-daygrid-day-number { text-decoration: none !important; color: var(--pantone-navy) !important; font-weight: 600; font-size: 13px; }
+    .fc-daygrid-day-number { text-decoration: none !important; color: var(--pantone-navy) !important; font-weight: 600; font-size: 13px; pointer-events: none; }
+    .fc-daygrid-day.fc-day-today { background-color: transparent !important; }
     .fc-daygrid-day.fc-day-today .fc-daygrid-day-frame { background-color: var(--occ-green-bg) !important; border-radius: 14px !important; border: 1.5px solid var(--occ-green-border) !important; }
     .fc-daygrid-day { height: 95px !important; cursor: pointer; }
     .occ-leave-label { background-color: var(--occ-label-bg) !important; color: #028090 !important; font-size: 11px !important; font-weight: bold; text-align: center; padding: 3px 4px; margin: 2px auto 0 auto; border-radius: 6px; width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
@@ -82,8 +86,9 @@
     .ios-picker-container::before { content: ""; position: absolute; left: 8px; right: 8px; top: 50%; transform: translateY(-50%); height: 36px; background: rgba(2, 128, 144, 0.06); border-top: 1px solid rgba(2, 128, 144, 0.15); border-bottom: 1px solid rgba(2, 128, 144, 0.15); border-radius: 8px; pointer-events: none; z-index: 5; }
     .ios-picker-col { height: 108px; overflow-y: scroll; scroll-snap-type: y mandatory; width: 70px; text-align: center; scrollbar-width: none; position: relative; }
     .ios-picker-col::-webkit-scrollbar { display: none; }
+    .ios-picker-col.full-width { width: 100%; }
     .ios-picker-item { height: 36px; line-height: 36px; scroll-snap-align: center; font-size: 15px; color: #b0c2c5; }
-    .ios-picker-item.selected { color: var(--pantone-navy) !important; font-weight: 800 !important; font-size: 17px !important; }
+    .ios-picker-item.selected { color: var(--pantone-navy) !important; font-weight: 800 !important; font-size: 17px !important; background: var(--occ-label-bg); border-radius: 8px; }
     .top-filter-bar { display: flex; background: white; border-radius: 14px; padding: 4px; gap: 4px; flex-wrap: wrap; }
     .top-filter-btn { flex: 1 1 auto; min-width: 70px; border: none; background: none; padding: 10px 4px; font-size: 12px; font-weight: 600; color: #7c8e94; border-radius: 10px; }
     .top-filter-btn.active { background: var(--pantone-navy); color: white; }
@@ -91,8 +96,9 @@
     .date-range-row { display: flex; align-items: center; gap: 8px; }
     .date-range-row .date-col { flex: 1; }
     .date-range-row .arrow-col { flex: 0 0 24px; text-align: center; color: #999; padding-top: 22px; }
-    .leave-item-row { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
-    .leave-item-actions button { border: none; background: none; font-size: 15px; padding: 4px 8px; }
+    .leave-item-row { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #eee; gap: 10px; }
+    .leave-item-actions { display: flex; flex-direction: row; align-items: center; gap: 12px; flex-shrink: 0; }
+    .leave-item-actions button { border: none; background: none; font-size: 20px; padding: 4px 6px; line-height: 1; }
     .leave-item-actions .edit-btn { color: var(--pantone-dark-sea); }
     .leave-item-actions .del-btn { color: #e05656; }
     .delegate-box { background: #fff7ec; border: 1px solid #f4d9b3; border-radius: 12px; padding: 10px 12px; margin-bottom: 14px; }
@@ -148,7 +154,15 @@
     <div class="container-fluid calendar-container">
 
       <!-- 首頁：月曆 -->
-      <div id="sect-home" class="app-section active"><div id="calendar"></div></div>
+      <div id="sect-home" class="app-section active">
+        <div class="custom-cal-header">
+          <button class="cal-nav-btn" onclick="calendar.prev()"><i class="fa-solid fa-chevron-left"></i></button>
+          <span class="cal-title" id="cal-title-text"></span>
+          <button class="cal-nav-btn" onclick="calendar.next()"><i class="fa-solid fa-chevron-right"></i></button>
+          <button class="cal-today-btn" onclick="calendar.today()">回到今天</button>
+        </div>
+        <div id="calendar"></div>
+      </div>
 
       <!-- 預定請假 -->
       <div id="sect-reserve" class="app-section">
@@ -215,14 +229,16 @@
           <button class="top-filter-btn" id="filter-btn-seluser" onclick="handleTopFilter('seluser')">選擇人員</button>
         </div>
 
-        <div id="custommonth-box" class="card-custom p-3 mb-3" style="display:none;">
-          <input type="month" id="overview-month-input" class="form-control" onchange="renderOverviewList('custommonth')">
+        <div id="custommonth-box" class="card-custom p-3 mb-3" style="display: none; background: #f4fafb;">
+          <label class="small text-secondary mb-1 d-block text-center">滑動選擇月份</label>
+          <div class="ios-picker-container" style="padding: 5px;"><div class="ios-picker-col full-width" id="picker-ov-month"></div></div>
+          <button class="btn btn-sm w-100 mt-2 text-white" style="background: var(--pantone-dark-sea); border:none;" onclick="renderOverviewList('custommonth')">確認篩選</button>
         </div>
 
         <div id="dynamic-wheel-box" class="card-custom p-3 mb-3" style="display: none; background: #f4fafb;">
           <div id="wheel-user-wrapper">
             <label class="small text-secondary mb-1 d-block text-center">滑動選擇人員</label>
-            <div class="ios-picker-container" style="padding: 5px;"><div class="ios-picker-col" id="picker-ov-user" style="width:120px;"></div></div>
+            <div class="ios-picker-container" style="padding: 5px;"><div class="ios-picker-col full-width" id="picker-ov-user"></div></div>
           </div>
           <button class="btn btn-sm w-100 mt-2 text-white" style="background: var(--pantone-dark-sea); border:none;" onclick="executeSearchFromWheel()">確認篩選</button>
         </div>
@@ -247,12 +263,27 @@
           <h5 class="modal-title">修改個人密碼</h5><button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <div class="mb-3"><label class="small text-secondary">舊密碼</label><input type="password" id="pwd-old" class="form-control"></div>
-          <i class="fa-solid fa-eye password-toggle-icon" id="toggle-password-btn" onclick="togglePasswordVisibility()"></i>
-          <div class="mb-3"><label class="small text-secondary">新密碼</label><input type="password" id="pwd-new" class="form-control"></div>
-          <i class="fa-solid fa-eye password-toggle-icon" id="toggle-password-btn" onclick="togglePasswordVisibility()"></i>
-          <div class="mb-3"><label class="small text-secondary">再次輸入新密碼</label><input type="password" id="pwd-confirm" class="form-control"></div>
-          <i class="fa-solid fa-eye password-toggle-icon" id="toggle-password-btn" onclick="togglePasswordVisibility()"></i>
+          <div class="mb-3">
+            <label class="small text-secondary">舊密碼</label>
+            <div class="password-wrapper">
+              <input type="password" id="pwd-old" class="form-control" style="padding-right:40px;">
+              <i class="fa-solid fa-eye password-toggle-icon" onclick="togglePwdFieldVisibility('pwd-old', this)"></i>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="small text-secondary">新密碼</label>
+            <div class="password-wrapper">
+              <input type="password" id="pwd-new" class="form-control" style="padding-right:40px;">
+              <i class="fa-solid fa-eye password-toggle-icon" onclick="togglePwdFieldVisibility('pwd-new', this)"></i>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="small text-secondary">再次輸入新密碼</label>
+            <div class="password-wrapper">
+              <input type="password" id="pwd-confirm" class="form-control" style="padding-right:40px;">
+              <i class="fa-solid fa-eye password-toggle-icon" onclick="togglePwdFieldVisibility('pwd-confirm', this)"></i>
+            </div>
+          </div>
           <button class="btn w-100 text-white py-2" style="background: var(--pantone-dark-sea); border-radius:12px;" onclick="submitChangePassword()">確認修改</button>
         </div>
       </div>
@@ -362,6 +393,18 @@
       const end = item.endDate || item.startDate;
       return dateStr >= item.startDate && dateStr <= end;
     }
+    // 保護性清理：不管後端有沒有正確格式化，前端一律把可能夾帶的 ISO 時間字串清乾淨
+    function cleanDateStr(v) {
+      if (!v) return v;
+      const s = String(v);
+      return s.includes('T') ? s.split('T')[0] : s;
+    }
+    function cleanTimeStr(v) {
+      if (!v) return v;
+      const s = String(v);
+      if (s.includes('T')) { const t = s.split('T')[1] || ''; return t.substring(0, 5); }
+      return s;
+    }
 
     // ===== 使用者 / 權限 =====
     function applyAdminUI() {
@@ -397,7 +440,14 @@
       showLoading(true);
       try {
         const res = await fetch(GOOGLE_SHEET_API + "?action=getData");
-        mockDb = await res.json();
+        const raw = await res.json();
+        mockDb = (Array.isArray(raw) ? raw : []).map(item => ({
+          ...item,
+          startDate: cleanDateStr(item.startDate),
+          endDate: cleanDateStr(item.endDate || item.startDate),
+          start: cleanTimeStr(item.start),
+          end: cleanTimeStr(item.end)
+        }));
         if (calendar) calendar.render();
         if (document.getElementById('sect-mytrips').classList.contains('active')) renderMyTrips();
         if (document.getElementById('sect-overview').classList.contains('active')) renderOverviewList(currentActiveFilter);
@@ -417,11 +467,15 @@
     }
 
     function togglePasswordVisibility() {
+      togglePwdFieldVisibility('login-password', document.getElementById('toggle-password-btn'));
+    }
+
+    function togglePwdFieldVisibility(inputId, iconEl) {
       try {
-        const pwdInput = document.getElementById("login-password");
-        const icon = document.getElementById("toggle-password-btn");
-        if (pwdInput.type === "password") { pwdInput.type = "text"; icon.classList.remove("fa-eye"); icon.classList.add("fa-eye-slash"); }
-        else { pwdInput.type = "password"; icon.classList.remove("fa-eye-slash"); icon.classList.add("fa-eye"); }
+        const pwdInput = document.getElementById(inputId);
+        if (!pwdInput || !iconEl) return;
+        if (pwdInput.type === "password") { pwdInput.type = "text"; iconEl.classList.remove("fa-eye"); iconEl.classList.add("fa-eye-slash"); }
+        else { pwdInput.type = "password"; iconEl.classList.remove("fa-eye-slash"); iconEl.classList.add("fa-eye"); }
       } catch(e) {}
     }
 
@@ -487,9 +541,12 @@
       const calEl = document.getElementById('calendar'); if (!calEl) return;
       calendar = new FullCalendar.Calendar(calEl, {
         initialView: 'dayGridMonth', locale: 'zh-tw', height: 'auto',
-        headerToolbar: { left: 'prev,title,next', center: '', right: 'today' },
-        buttonText: { today: '回到今天' },
+        headerToolbar: false,
         dayCellContent: function(arg) { return String(arg.date.getDate()); },
+        datesSet: function(info) {
+          const titleEl = document.getElementById('cal-title-text');
+          if (titleEl) titleEl.innerText = info.view.title;
+        },
         dateClick: function(info) { openDayDetail(info.dateStr); },
         dayCellDidMount: function(info) {
           const dateStr = info.date.getFullYear() + '-' + String(info.date.getMonth()+1).padStart(2,'0') + '-' + String(info.date.getDate()).padStart(2,'0');
@@ -630,9 +687,7 @@
     function bindDateAutoClose() {
       const start = document.getElementById('leave-start-date');
       const end = document.getElementById('leave-end-date');
-      start.addEventListener('change', () => {
-        if (start.value) { if (!end.value || end.value < start.value) end.value = start.value; start.blur(); }
-      });
+      start.addEventListener('change', () => { if (start.value) start.blur(); });
       end.addEventListener('change', () => { if (end.value) end.blur(); });
     }
 
@@ -703,7 +758,7 @@
       let html = '';
       mine.forEach(item => {
         html += `<div class="leave-item-row">
-          <div><strong>${currentUser.isAdmin ? item.name + '　' : ''}${formatDateRangeDisplay(item.startDate, item.endDate)}</strong><br><span class="text-secondary small">${item.start}~${item.end}${item.memo && item.memo !== '無' ? ' | ' + item.memo : ''}</span></div>
+          <div><strong>${currentUser.isAdmin ? item.name + '　' : ''}${formatDateRangeDisplay(item.startDate, item.endDate)}</strong></div>
           <div class="leave-item-actions">
             <button class="edit-btn" onclick='editFromMyTrips(${JSON.stringify(item).replace(/'/g,"&#39;")})'><i class="fa-solid fa-pen-to-square"></i></button>
             <button class="del-btn" onclick="deleteLeaveById('${item.id}')"><i class="fa-solid fa-trash-can"></i></button>
@@ -757,7 +812,7 @@
       if (mode === 'day') { filtered = mockDb.filter(d => rangeOverlapsDate(d, tStr)); title = `<h6>今日 (${tStr}) 紀錄：</h6>`; }
       else if (mode === 'month') { filtered = mockDb.filter(d => (d.startDate <= mStr + '-31') && ((d.endDate || d.startDate) >= mStr + '-01')); title = `<h6>本月 (${mStr}) 紀錄：</h6>`; }
       else if (mode === 'custommonth') {
-        const v = document.getElementById('overview-month-input').value;
+        const v = getWheelValue('picker-ov-month');
         if (!v) { container.innerHTML = "<p class='text-muted text-center py-3 small'>請先選擇月份</p>"; return; }
         filtered = mockDb.filter(d => (d.startDate <= v + '-31') && ((d.endDate || d.startDate) >= v + '-01'));
         title = `<h6>${v} 紀錄：</h6>`;
@@ -771,7 +826,14 @@
       else {
         let html = title;
         filtered.sort((a,b) => a.startDate < b.startDate ? -1 : 1).forEach(x => {
-          html += `<div class='p-2 mb-2 border-bottom small'><strong>${x.name}</strong> (${formatDateRangeDisplay(x.startDate, x.endDate)})<br><span class='text-secondary'>${x.start}~${x.end}${x.memo && x.memo !== '無' ? ' | ' + x.memo : ''}</span></div>`;
+          const canManage = currentUser && (currentUser.isAdmin || x.name === currentUser.name);
+          html += `<div class="leave-item-row">
+            <div><strong>${x.name}</strong>　${formatDateRangeDisplay(x.startDate, x.endDate)}<br><span class="text-secondary small">${x.start}~${x.end}${x.memo && x.memo !== '無' ? ' | ' + x.memo : ''}</span></div>
+            ${canManage ? `<div class="leave-item-actions">
+              <button class="edit-btn" onclick='editFromMyTrips(${JSON.stringify(x).replace(/'/g,"&#39;")})'><i class="fa-solid fa-pen-to-square"></i></button>
+              <button class="del-btn" onclick="deleteLeaveById('${x.id}')"><i class="fa-solid fa-trash-can"></i></button>
+            </div>` : ''}
+          </div>`;
         });
         container.innerHTML = html;
       }
@@ -828,7 +890,41 @@
       fill('picker-sh', 24); fill('picker-sm', 60); fill('picker-eh', 24); fill('picker-em', 60);
       fill('q-picker-sh', 24); fill('q-picker-sm', 60); fill('q-picker-eh', 24); fill('q-picker-em', 60);
       fillUserPicker();
+      fillMonthPicker();
       pickersInitialized = true;
+    }
+
+    function fillMonthPicker() {
+      const el = document.getElementById('picker-ov-month');
+      if (!el) return;
+      el.innerHTML = "<div style='height:36px;'></div>";
+      const now = new Date();
+      const months = [];
+      for (let i = -24; i <= 12; i++) {
+        const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
+        const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0');
+        months.push({ value: `${y}-${m}`, label: `${y}年${d.getMonth() + 1}月` });
+      }
+      const curValue = thisMonthStr();
+      let selectedIndex = 0;
+      months.forEach((mo, i) => {
+        const item = document.createElement('div');
+        const isSel = mo.value === curValue;
+        if (isSel) selectedIndex = i;
+        item.className = 'ios-picker-item' + (isSel ? ' selected' : '');
+        item.innerText = mo.label;
+        item.dataset.value = mo.value;
+        el.appendChild(item);
+      });
+      let pad = document.createElement('div'); pad.style.height = '36px'; el.appendChild(pad);
+      el.scrollTop = selectedIndex * 36;
+      el.addEventListener('scroll', () => {
+        clearTimeout(el.t); el.t = setTimeout(() => {
+          const idx = Math.round(el.scrollTop / 36) + 1;
+          Array.from(el.children).forEach(c => c.classList.remove('selected'));
+          if (el.children[idx]) el.children[idx].classList.add('selected');
+        }, 60);
+      });
     }
 
     function fillUserPicker() {
@@ -854,7 +950,8 @@
     function getWheelValue(id) {
       const el = document.getElementById(id);
       const sel = el ? el.querySelector('.selected') : null;
-      return sel ? sel.innerText : (el && el.children[1] ? el.children[1].innerText : "00");
+      if (!sel) return (el && el.children[1] ? el.children[1].innerText : "00");
+      return sel.dataset && sel.dataset.value !== undefined ? sel.dataset.value : sel.innerText;
     }
 
     function setWheelValueDisplay(id, value) {
@@ -868,7 +965,16 @@
     }
 
     function showLoading(show) { document.getElementById('loading-spinner').style.display = show ? 'flex' : 'none'; }
-    function openChangePasswordModal() { new bootstrap.Modal(document.getElementById('changePasswordModal')).show(); }
+    function openChangePasswordModal() {
+      ['pwd-old', 'pwd-new', 'pwd-confirm'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) { el.value = ''; el.type = 'password'; }
+      });
+      document.querySelectorAll('#changePasswordModal .password-toggle-icon').forEach(ic => {
+        ic.classList.remove('fa-eye-slash'); ic.classList.add('fa-eye');
+      });
+      new bootstrap.Modal(document.getElementById('changePasswordModal')).show();
+    }
   </script>
 </body>
 </html>
