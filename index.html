@@ -7,7 +7,7 @@
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#114B5F">
+  <meta name="theme-color" content="#FFFFFF">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -116,11 +116,11 @@
         <img src="logo.png" alt="Logo">
       </div>
       <div class="mb-3 text-start">
-        <label class="form-label text-secondary small fw-bold">員工人資帳號</label>
-        <input type="text" id="login-account" class="form-control py-2" placeholder="請輸入人資帳號" style="border-radius:12px;">
+        <label class="form-label text-secondary small fw-bold">帳號</label>
+        <input type="text" id="login-account" class="form-control py-2" placeholder="請輸入公司員工帳號" style="border-radius:12px;">
       </div>
       <div class="mb-4 text-start">
-        <label class="form-label text-secondary small fw-bold">登入密碼</label>
+        <label class="form-label text-secondary small fw-bold">密碼</label>
         <div class="password-wrapper">
           <input type="password" id="login-password" class="form-control py-2" placeholder="請輸入密碼" style="border-radius:12px; padding-right: 40px;">
           <i class="fa-solid fa-eye password-toggle-icon" id="toggle-password-btn" onclick="togglePasswordVisibility()"></i>
@@ -134,8 +134,7 @@
   <div id="main-application" style="display: none;">
     <div class="occ-navbar">
       <div class="navbar-brand-box" id="nav-brand-box">
-        <img src="logo.png" alt="logo">
-        <span><i class="fa-solid fa-plane"></i> </span>
+        <span><i class="fa-solid fa-umbrella-beach"></i> OCC 休假表</span> 
       </div>
       <div>
         <button class="btn btn-sm btn-outline-light me-1" onclick="openChangePasswordModal()">改密碼</button>
@@ -147,7 +146,7 @@
         <i class="fa-solid fa-plane"></i> HELLO <span id="user-greeting">同仁</span>
         <span class="admin-badge" id="admin-shield" style="display:none;"><i class="fa-solid fa-user-gear"></i> 管理員模式</span>
       </div>
-      <div class="info-tip" id="home-info-tip"><i class="fa-solid fa-lightbulb" style="color: rgb(255, 212, 59);"></i> 點選日期查看詳情</div>
+      <div class="info-tip" id="home-info-tip"><i class="fa-light fa-lightbulb" style="color: rgb(255, 212, 59);"></i> 點選日期查看詳情</div>
     </div>
     
 
@@ -170,7 +169,7 @@
           <h5 class="mb-3 fw-bold" style="color:var(--pantone-navy);"><i class="fa-solid fa-calendar-check me-2"></i><span id="reserve-form-title">填寫請假申請</span></h5>
 
           <div id="reserve-delegate-box" class="delegate-box" style="display:none;">
-            <label class="small text-secondary mb-1 d-block fw-bold"><i class="fa-solid fa-id-badge"></i>代為申請對象</label>
+            <label class="small text-secondary mb-1 d-block fw-bold"><i class="fa-solid fa-id-badge"></i> 代為申請對象</label>
             <select id="reserve-delegate-select" class="form-select form-select-sm"></select>
           </div>
 
@@ -179,7 +178,7 @@
               <label class="small text-secondary mb-1">開始日期</label>
               <input type="date" id="leave-start-date" class="form-control">
             </div>
-            <div class="arrow-col pt-4"><i class="fa-solid fa-right-long" style="color: #a2d3ea;"></i></div>
+            <div class="arrow-col pt-4"><i class="fa-solid fa-right-long"></i></div>
             <div class="date-col">
               <label class="small text-secondary mb-1">結束日期</label>
               <input type="date" id="leave-end-date" class="form-control">
@@ -189,8 +188,8 @@
           <div class="mb-3">
             <label class="small text-secondary mb-1">時間類型</label>
             <div class="toggle-group">
-              <button class="toggle-btn active" id="btn-time-full" onclick="setLeaveType('full')">整天 (08-17)</button>
-              <button class="toggle-btn" id="btn-time-custom" onclick="setLeaveType('custom')">特殊時段</button>
+              <button class="toggle-btn active" id="btn-time-full" onclick="setLeaveType('full')">整天</button>
+              <button class="toggle-btn" id="btn-time-custom" onclick="setLeaveType('custom')">特定時段</button>
             </div>
           </div>
 
@@ -215,7 +214,7 @@
       <!-- 行程管理 / 我的請假清單 -->
       <div id="sect-mytrips" class="app-section">
         <div class="card-custom">
-          <h5 class="mb-3 fw-bold" style="color:var(--pantone-navy);"><i class="fa-solid fa-list"></i><span id="mytrips-title">我的請假清單</span></h5>
+          <h5 class="mb-3 fw-bold" style="color:var(--pantone-navy);"><i class="fa-solid fa-list-ul"></i><span id="mytrips-title"> 我的請假清單</span></h5>
           <div id="my-leaves-list"></div>
         </div>
       </div>
