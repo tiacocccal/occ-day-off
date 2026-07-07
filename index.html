@@ -25,7 +25,7 @@
     body {
       background-color: var(--pantone-light-bg);
       font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
-      margin: 0; padding-bottom: 85px; user-select: none;
+      margin: 0; padding-bottom: 100px; user-select: none;
     }
     /* ===== 登入畫面 ===== */
     .login-page-bg {
@@ -51,7 +51,7 @@
     .status-bar { background-color: white; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #EAEAEA; }
     .user-greeting-box { font-size: 17px; font-weight: 800; color: #028090; }
     .admin-badge { background-color: #FFEBEB; color: #FF4D4D; font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: bold; margin-left: 6px; }
-    .occ-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: white; box-shadow: 0 -3px 12px rgba(0,0,0,0.04); display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
+    .occ-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; padding-bottom: max(14px, env(safe-area-inset-bottom)); background: white; box-shadow: 0 -3px 12px rgba(0,0,0,0.04); display: flex; justify-content: space-around; align-items: center; z-index: 1000; box-sizing: content-box; }
     .footer-item { display: flex; flex-direction: column; align-items: center; color: #8c9ba5; font-size: 11px; background: none; border: none; width: 25%; }
     .footer-item.active { color: var(--pantone-dark-sea); font-weight: bold; }
     .footer-item i { font-size: 20px; margin-bottom: 3px; }
@@ -72,9 +72,13 @@
     .fc-daygrid-day-top { justify-content: center; padding-top: 4px; }
     .fc-daygrid-day-number { text-decoration: none !important; color: var(--pantone-navy) !important; font-weight: 600; font-size: 13px; pointer-events: none; }
     .fc-daygrid-day.fc-day-today { background-color: transparent !important; }
-    .fc-daygrid-day.fc-day-today .fc-daygrid-day-frame { background-color: var(--occ-green-bg) !important; border-radius: 14px !important; border: 1.5px solid var(--occ-green-border) !important; }
+    .fc-daygrid-day.fc-day-today .fc-daygrid-day-frame { background-color: var(--occ-green-bg) !important; border-radius: 6px !important; border: none !important; }
+    .fc-daygrid-day-frame { border-top: 1px solid #eef0f0 !important; }
+    .fc-daygrid-body tr:first-child .fc-daygrid-day-frame { border-top: none !important; }
     .fc-daygrid-day { height: 95px !important; cursor: pointer; }
-    .occ-leave-label { background-color: var(--occ-label-bg) !important; color: #028090 !important; font-size: 11px !important; font-weight: bold; text-align: center; padding: 3px 4px; margin: 2px auto 0 auto; border-radius: 6px; width: 90%; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; display: block; }
+    .fc-daygrid-event.occ-leave-label { background-color: var(--occ-label-bg) !important; border: none !important; color: #028090 !important; font-size: 11px !important; font-weight: bold; text-align: center; padding: 3px 4px; margin: 1px 2px 0 2px; border-radius: 6px; }
+    .occ-leave-label .fc-event-title, .occ-leave-label .fc-event-main { color: #028090 !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .occ-leave-label .fc-daygrid-event-dot { display: none; }
 
     .card-custom { background: white; border-radius: 24px; box-shadow: 0 8px 24px rgba(11, 75, 95, 0.06); border: none; padding: 20px; margin-bottom: 16px; }
     .app-section { display: none; width: 100%; }
@@ -90,9 +94,17 @@
     .ios-picker-item { height: 36px; line-height: 36px; scroll-snap-align: center; font-size: 15px; color: #b0c2c5; }
     .ios-picker-item.selected { color: var(--pantone-navy) !important; font-weight: 800 !important; font-size: 17px !important; background: var(--occ-label-bg); border-radius: 8px; }
     .top-filter-bar { display: flex; background: white; border-radius: 14px; padding: 4px; gap: 4px; flex-wrap: wrap; }
-    .top-filter-btn { flex: 1 1 auto; min-width: 70px; border: none; background: none; padding: 10px 4px; font-size: 12px; font-weight: 600; color: #7c8e94; border-radius: 10px; }
+    .top-filter-btn { flex: 1 1 auto; min-width: 70px; border: none; background: none; padding: 10px 4px; font-size: 15px; font-weight: 700; color: #7c8e94; border-radius: 10px; }
     .top-filter-btn.active { background: var(--pantone-navy); color: white; }
-    .spinner-overlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,255,255,0.8); z-index:9999; display:flex; align-items:center; justify-content:center; }
+    .spinner-overlay { position: fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(255,255,255,0.85); z-index:9999; display:flex; align-items:center; justify-content:center; }
+    .plane-loader { position: relative; width: 240px; height: 60px; overflow: hidden; }
+    .plane-loader i { position: absolute; top: 50%; left: -10%; transform: translateY(-50%); font-size: 34px; color: var(--pantone-turquoise); animation: plane-fly 1.6s linear infinite; }
+    @keyframes plane-fly {
+      0%   { left: -10%; opacity: 0; }
+      12%  { opacity: 1; }
+      88%  { opacity: 1; }
+      100% { left: 100%; opacity: 0; }
+    }
     .date-range-row { display: flex; align-items: center; gap: 8px; }
     .date-range-row .date-col { flex: 1; }
     .date-range-row .arrow-col { flex: 0 0 24px; text-align: center; color: #999; padding-top: 22px; }
@@ -106,7 +118,7 @@
 </head>
 <body>
   <div id="loading-spinner" class="spinner-overlay" style="display:none;">
-    <div class="spinner-border text-success" role="status"><span class="visually-hidden">Loading...</span></div>
+    <div class="plane-loader"><i class="fa-solid fa-plane"></i></div>
   </div>
 
   <!-- 登入畫面 -->
@@ -384,9 +396,35 @@
       const d = new Date();
       return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
     }
+    // 項目8：畫面顯示一律用 2026/7/3 這種斜線格式，內部資料仍維持 yyyy-MM-dd 不動
+    function dispDate(dateStr) {
+      if (!dateStr) return dateStr;
+      const parts = String(dateStr).split('-');
+      if (parts.length !== 3) return dateStr;
+      return `${parts[0]}/${parseInt(parts[1],10)}/${parseInt(parts[2],10)}`;
+    }
+    function dispMonth(mStr) {
+      if (!mStr) return mStr;
+      const parts = String(mStr).split('-');
+      if (parts.length !== 2) return mStr;
+      return `${parts[0]}/${parseInt(parts[1],10)}`;
+    }
     function formatDateRangeDisplay(startDate, endDate) {
-      if (!endDate || endDate === startDate) return startDate;
-      return `${startDate} ~ ${endDate}`;
+      if (!endDate || endDate === startDate) return dispDate(startDate);
+      return `${dispDate(startDate)} ~ ${dispDate(endDate)}`;
+    }
+    // 項目5：整天請假不顯示時間區段
+    function timeRangeDisplay(item) {
+      if (item.start === '08:30' && item.end === '17:00') return '';
+      return `　${item.start}~${item.end}`;
+    }
+    function detailLine(item) {
+      const t = timeRangeDisplay(item).trim();
+      const hasMemo = item.memo && item.memo !== '無';
+      if (t && hasMemo) return `${t} | ${item.memo}`;
+      if (t) return t;
+      if (hasMemo) return item.memo;
+      return '整天';
     }
     function rangeOverlapsDate(item, dateStr) {
       const end = item.endDate || item.startDate;
@@ -447,7 +485,7 @@
           start: cleanTimeStr(item.start),
           end: cleanTimeStr(item.end)
         }));
-        if (calendar) calendar.render();
+        if (calendar) calendar.refetchEvents();
         if (document.getElementById('sect-mytrips').classList.contains('active')) renderMyTrips();
         if (document.getElementById('sect-overview').classList.contains('active')) renderOverviewList(currentActiveFilter);
       } catch (err) {
@@ -536,6 +574,21 @@
     }
 
     // ===== 月曆 =====
+    function addDaysToDateStr(dateStr, n) {
+      const d = new Date(dateStr + 'T00:00:00');
+      d.setDate(d.getDate() + n);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+    function buildFcEvents() {
+      return mockDb.map(item => ({
+        title: item.name,
+        start: item.startDate,
+        end: addDaysToDateStr(item.endDate || item.startDate, 1), // FullCalendar 全天事件 end 為不包含結束日，要 +1 天
+        allDay: true,
+        classNames: ['occ-leave-label']
+      }));
+    }
+
     function initCalendar() {
       const calEl = document.getElementById('calendar'); if (!calEl) return;
       calendar = new FullCalendar.Calendar(calEl, {
@@ -547,16 +600,12 @@
           if (titleEl) titleEl.innerText = info.view.title;
         },
         dateClick: function(info) { openDayDetail(info.dateStr); },
-        dayCellDidMount: function(info) {
-          const dateStr = info.date.getFullYear() + '-' + String(info.date.getMonth()+1).padStart(2,'0') + '-' + String(info.date.getDate()).padStart(2,'0');
-          const matched = mockDb.filter(d => rangeOverlapsDate(d, dateStr));
-          if (matched.length > 0) {
-            let container = info.el.querySelector('.fc-daygrid-day-events') || info.el;
-            let html = '<div class="fc-event-container">';
-            matched.forEach(lv => { html += `<div class="occ-leave-label">${lv.name}</div>`; });
-            html += '</div>'; container.insertAdjacentHTML('beforeend', html);
-          }
-        }
+        eventClick: function(info) {
+          const cell = info.el.closest('.fc-daygrid-day');
+          const d = cell ? cell.getAttribute('data-date') : info.event.startStr;
+          if (d) openDayDetail(d);
+        },
+        events: function(fetchInfo, successCallback) { successCallback(buildFcEvents()); }
       });
       calendar.render();
     }
@@ -564,7 +613,7 @@
     // ===== 點日期 -> 當天請假名單 + 登記請假按鈕 =====
     function openDayDetail(dateStr) {
       currentDayDetailDate = dateStr;
-      document.getElementById('dayDetailTitle').innerText = `${dateStr} 請假名單`;
+      document.getElementById('dayDetailTitle').innerText = `${dispDate(dateStr)} 請假名單`;
       const list = mockDb.filter(d => rangeOverlapsDate(d, dateStr));
       const box = document.getElementById('dayDetailList');
       if (list.length === 0) {
@@ -574,7 +623,7 @@
         list.forEach(item => {
           const canManage = currentUser && (currentUser.isAdmin || item.name === currentUser.name);
           html += `<div class="leave-item-row">
-            <div><strong>${item.name}</strong><br><span class="text-secondary small">${formatDateRangeDisplay(item.startDate, item.endDate)}　${item.start}~${item.end}</span></div>
+            <div><strong>${item.name}</strong><br><span class="text-secondary small">${formatDateRangeDisplay(item.startDate, item.endDate)}　${detailLine(item)}</span></div>
             ${canManage ? `<div class="leave-item-actions">
               <button class="edit-btn" onclick='openQuickLeaveModal(null, ${JSON.stringify(item).replace(/'/g,"&#39;")})'><i class="fa-solid fa-pen-to-square"></i></button>
               <button class="del-btn" onclick="deleteLeaveById('${item.id}')"><i class="fa-solid fa-trash-can"></i></button>
@@ -591,7 +640,9 @@
     function openQuickLeaveModal(dateStr, existingEntry) {
       editingLeaveId = existingEntry ? existingEntry.id : null;
       const showDate = existingEntry ? existingEntry.startDate : dateStr;
-      document.getElementById('quick-date-display').innerText = showDate;
+      const qDateEl = document.getElementById('quick-date-display');
+      qDateEl.innerText = dispDate(showDate);
+      qDateEl.dataset.raw = showDate;
       document.getElementById('q-leave-memo').value = existingEntry ? (existingEntry.memo || '') : '';
 
       const delegateSel = document.getElementById('quick-delegate-select');
@@ -599,7 +650,7 @@
         delegateSel.value = existingEntry ? existingEntry.name : currentUser.name;
       }
 
-      if (existingEntry && existingEntry.start && existingEntry.start !== '08:00') {
+      if (existingEntry && existingEntry.start && existingEntry.start !== '08:30') {
         setQuickLeaveType('custom');
         setWheelValueDisplay('q-picker-sh', existingEntry.start.split(':')[0]);
         setWheelValueDisplay('q-picker-sm', existingEntry.start.split(':')[1]);
@@ -622,10 +673,10 @@
     }
 
     function submitQuickLeave() {
-      const dateVal = document.getElementById('quick-date-display').innerText;
+      const dateVal = document.getElementById('quick-date-display').dataset.raw;
       if (!dateVal) { alert('日期錯誤'); return; }
       const memoVal = document.getElementById('q-leave-memo').value.trim();
-      let startTime = "08:00", endTime = "17:00";
+      let startTime = "08:30", endTime = "17:00";
       if (selectedQuickLeaveType === 'custom') {
         startTime = `${getWheelValue('q-picker-sh')}:${getWheelValue('q-picker-sm')}`;
         endTime = `${getWheelValue('q-picker-eh')}:${getWheelValue('q-picker-em')}`;
@@ -684,10 +735,8 @@
     }
 
     function bindDateAutoClose() {
-      const start = document.getElementById('leave-start-date');
-      const end = document.getElementById('leave-end-date');
-      start.addEventListener('change', () => { if (start.value) start.blur(); });
-      end.addEventListener('change', () => { if (end.value) end.blur(); });
+      // 之前用 change 事件自動 blur 想讓選擇器自動關閉，
+      // 但在部分手機瀏覽器上會導致「還沒點選就先跳開」的問題，故不再自動 blur，交給使用者自行操作。
     }
 
     function submitReserveForm() {
@@ -696,7 +745,7 @@
       const memoVal = document.getElementById('leave-memo').value.trim();
       if (!startVal) { alert('請選取日期'); return; }
 
-      let startTime = "08:00", endTime = "17:00";
+      let startTime = "08:30", endTime = "17:00";
       if (selectedLeaveType === 'custom') {
         startTime = `${getWheelValue('picker-sh')}:${getWheelValue('picker-sm')}`;
         endTime = `${getWheelValue('picker-eh')}:${getWheelValue('picker-em')}`;
@@ -776,7 +825,7 @@
       document.getElementById('leave-end-date').value = item.endDate || item.startDate;
       document.getElementById('leave-memo').value = (item.memo && item.memo !== '無') ? item.memo : '';
       if (currentUser.isAdmin) document.getElementById('reserve-delegate-select').value = item.name;
-      if (item.start && item.start !== '08:00') {
+      if (item.start && item.start !== '08:30') {
         setLeaveType('custom');
         setWheelValueDisplay('picker-sh', item.start.split(':')[0]);
         setWheelValueDisplay('picker-sm', item.start.split(':')[1]);
@@ -808,13 +857,13 @@
       const tStr = todayStr(); const mStr = thisMonthStr();
       let filtered = []; let title = "";
 
-      if (mode === 'day') { filtered = mockDb.filter(d => rangeOverlapsDate(d, tStr)); title = `<h6>今日 (${tStr}) 紀錄：</h6>`; }
-      else if (mode === 'month') { filtered = mockDb.filter(d => (d.startDate <= mStr + '-31') && ((d.endDate || d.startDate) >= mStr + '-01')); title = `<h6>本月 (${mStr}) 紀錄：</h6>`; }
+      if (mode === 'day') { filtered = mockDb.filter(d => rangeOverlapsDate(d, tStr)); title = `<h6>今日 (${dispDate(tStr)}) 紀錄：</h6>`; }
+      else if (mode === 'month') { filtered = mockDb.filter(d => (d.startDate <= mStr + '-31') && ((d.endDate || d.startDate) >= mStr + '-01')); title = `<h6>本月 (${dispMonth(mStr)}) 紀錄：</h6>`; }
       else if (mode === 'custommonth') {
         const v = getWheelValue('picker-ov-month');
         if (!v) { container.innerHTML = "<p class='text-muted text-center py-3 small'>請先選擇月份</p>"; return; }
         filtered = mockDb.filter(d => (d.startDate <= v + '-31') && ((d.endDate || d.startDate) >= v + '-01'));
-        title = `<h6>${v} 紀錄：</h6>`;
+        title = `<h6>${dispMonth(v)} 紀錄：</h6>`;
       }
       else if (mode === 'seluser') {
         const u = getWheelValue('picker-ov-user');
@@ -827,7 +876,7 @@
         filtered.sort((a,b) => a.startDate < b.startDate ? -1 : 1).forEach(x => {
           const canManage = currentUser && (currentUser.isAdmin || x.name === currentUser.name);
           html += `<div class="leave-item-row">
-            <div><strong>${x.name}</strong>　${formatDateRangeDisplay(x.startDate, x.endDate)}<br><span class="text-secondary small">${x.start}~${x.end}${x.memo && x.memo !== '無' ? ' | ' + x.memo : ''}</span></div>
+            <div><strong>${x.name}</strong>　${formatDateRangeDisplay(x.startDate, x.endDate)}<br><span class="text-secondary small">${detailLine(x)}</span></div>
             ${canManage ? `<div class="leave-item-actions">
               <button class="edit-btn" onclick='editFromMyTrips(${JSON.stringify(x).replace(/'/g,"&#39;")})'><i class="fa-solid fa-pen-to-square"></i></button>
               <button class="del-btn" onclick="deleteLeaveById('${x.id}')"><i class="fa-solid fa-trash-can"></i></button>
@@ -899,7 +948,7 @@
       el.innerHTML = "<div style='height:36px;'></div>";
       const now = new Date();
       const months = [];
-      for (let i = -24; i <= 12; i++) {
+      for (let i = -12; i <= 12; i++) {
         const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
         const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0');
         months.push({ value: `${y}-${m}`, label: `${y}年${d.getMonth() + 1}月` });
