@@ -218,7 +218,7 @@
             <textarea id="leave-memo" class="form-control" rows="3" placeholder="如：公出參訪/度假囉!/心情不美麗/身體不適..."></textarea>
           </div>
 
-          <button class="btn w-100 py-2 text-white fw-bold" id="reserve-submit-btn" style="background-color: var(--pantone-turquoise); border-radius:12px;" onclick="submitReserveForm()">送出預定</button>
+          <button class="btn w-100 py-2 text-white fw-bold" id="reserve-submit-btn" style="background-color: var(--pantone-dark-sea); border-radius:6px;" onclick="submitReserveForm()">送出預定</button>
           <button class="btn w-100 py-2 mt-2 text-secondary fw-bold" id="reserve-cancel-btn" style="display:none; border-radius:12px;" onclick="cancelEditReserve()">取消編輯</button>
         </div>
       </div>
@@ -226,7 +226,7 @@
       <!-- 行程管理 / 我的請假清單 -->
       <div id="sect-mytrips" class="app-section">
         <div class="card-custom">
-          <h5 class="mb-3 fw-bold" style="color:var(--pantone-navy);"><i class="fa-solid fa-list-ul"></i><span id="mytrips-title"> 我的請假清單</span></h5>
+          <h5 class="mb-3 fw-bold" style="color:var(--pantone-navy);"><i class="fa-solid fa-list-ul"></i> <span id="mytrips-title"> 我的請假清單</span></h5>
           <div id="my-leaves-list"></div>
         </div>
       </div>
@@ -243,7 +243,7 @@
         <div id="custommonth-box" class="card-custom p-3 mb-3" style="display: none; background: #f4fafb;">
           <label class="small text-secondary mb-1 d-block text-center">滑動選擇月份</label>
           <div class="ios-picker-container" style="padding: 5px;"><div class="ios-picker-col full-width" id="picker-ov-month"></div></div>
-          <button class="btn btn-sm w-100 mt-2 text-white" style="background: var(--pantone-dark-sea); border:none;" onclick="renderOverviewList('custommonth')">確認篩選</button>
+          <button class="btn btn-sm w-100 mt-3 text-white" style="background: var(--pantone-dark-sea); border:none;" onclick="renderOverviewList('custommonth')">確認篩選</button>
         </div>
 
         <div id="dynamic-wheel-box" class="card-custom p-3 mb-3" style="display: none; background: #f4fafb;">
@@ -251,7 +251,7 @@
             <label class="small text-secondary mb-1 d-block text-center">滑動選擇人員</label>
             <div class="ios-picker-container" style="padding: 5px;"><div class="ios-picker-col full-width" id="picker-ov-user"></div></div>
           </div>
-          <button class="btn btn-sm w-100 mt-2 text-white" style="background: var(--pantone-dark-sea); border:none;" onclick="executeSearchFromWheel()">確認篩選</button>
+          <button class="btn btn-sm w-100 mt-3 text-white" style="background: var(--pantone-dark-sea); border:none;" onclick="executeSearchFromWheel()">確認篩選</button>
         </div>
 
         <div class="card-custom"><div id="all-leaves-list"></div></div>
@@ -867,7 +867,7 @@
       }
       else if (mode === 'seluser') {
         const u = getWheelValue('picker-ov-user');
-        filtered = mockDb.filter(d => d.name === u); title = `<h6>同仁 (${u}) 查詢結果：</h6>`;
+        filtered = mockDb.filter(d => d.name === u); title = `<h6> (${u}) 查詢結果：</h6>`;
       }
 
       if (filtered.length === 0) { container.innerHTML = title + "<p class='text-muted text-center py-3 small'>無請假紀錄</p>"; }
