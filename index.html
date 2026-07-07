@@ -15,11 +15,15 @@
     :root {
       --pantone-turquoise: #00A896;
       --pantone-dark-sea: #028090;
-      --pantone-navy: #114B5F;
-      --pantone-light-bg: #F8FBFB;
-      --occ-green-bg: #BCE3DF;
+      --pantone-navy: #1B4B5A;
+      --pantone-light-bg: #FBF8F4;
+      --occ-green-bg: #CDEEE1;
       --occ-green-border: #4AA39A;
-      --occ-label-bg: #D2EFEA;
+      --occ-label-bg: #FBE3C8;
+      --occ-label-text: #B96A2C;
+      --brand-sky: #8FCBE8;
+      --brand-peach: #F4BD93;
+      --brand-gradient: linear-gradient(90deg, #79C2E6 0%, #F4BD93 100%);
     }
     html, body { height: 100%; }
     body {
@@ -31,7 +35,7 @@
     .login-page-bg {
       min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center;
       padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom)) 20px;
-      background: linear-gradient(180deg, #B9E3F8 0%, #FFFFFF 100%);
+      background: linear-gradient(180deg, #9AD5EC 0%, #F6CDA3 100%);
     }
     .login-card-custom {
       background: rgba(255, 255, 255, 0.95); border-radius: 24px; padding: 24px;
@@ -40,12 +44,12 @@
     /* logo 放大到約螢幕 1/3 高，但用固定框 + object-fit:contain 保證不會撐爆版面 */
     .login-logo-box { width: 100%; height: 30vh; max-height: 280px; display: flex; justify-content: center; align-items: center; margin-bottom: 8px; }
     .login-logo-box img { max-width: 85%; max-height: 100%; width: auto; height: auto; object-fit: contain; }
-    .login-btn-gradient { background: linear-gradient(90deg, #79C2E6 0%, #F4BD93 100%); color: white !important; border: none; border-radius: 14px; font-weight: bold; padding: 12px; }
+    .login-btn-gradient { background: var(--brand-gradient); color: white !important; border: none; border-radius: 14px; font-weight: bold; padding: 12px; }
     .password-wrapper { position: relative; }
     .password-toggle-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #a0b0b5; z-index: 10; }
 
     /* ===== Header / Footer ===== */
-    .occ-navbar { background-color: var(--pantone-navy); color: white; padding: 14px 16px; display: flex; justify-content: space-between; align-items: center; }
+    .occ-navbar { background-color: var(--pantone-navy); color: white; padding: 14px 16px; padding-top: max(14px, env(safe-area-inset-top)); display: flex; justify-content: space-between; align-items: center; }
     .navbar-brand-box { display: flex; align-items: center; gap: 8px; font-size: 19px; font-weight: bold; }
     .navbar-brand-box img { max-height: 28px; width: auto; object-fit: contain; }
     .status-bar { background-color: white; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #EAEAEA; }
@@ -73,11 +77,10 @@
     .fc-daygrid-day-number { text-decoration: none !important; color: var(--pantone-navy) !important; font-weight: 600; font-size: 13px; pointer-events: none; }
     .fc-daygrid-day.fc-day-today { background-color: transparent !important; }
     .fc-daygrid-day.fc-day-today .fc-daygrid-day-frame { background-color: var(--occ-green-bg) !important; border-radius: 6px !important; border: none !important; }
-    .fc-daygrid-day-frame { border-top: 1px solid #eef0f0 !important; }
-    .fc-daygrid-body tr:first-child .fc-daygrid-day-frame { border-top: none !important; }
-    .fc-daygrid-day { height: 95px !important; cursor: pointer; }
-    .fc-daygrid-event.occ-leave-label { background-color: var(--occ-label-bg) !important; border: none !important; color: #028090 !important; font-size: 11px !important; font-weight: bold; text-align: center; padding: 3px 4px; margin: 1px 2px 0 2px; border-radius: 6px; }
-    .occ-leave-label .fc-event-title, .occ-leave-label .fc-event-main { color: #028090 !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .fc-daygrid-day { height: 95px !important; cursor: pointer; border-top: 1px solid #eef0f0; }
+    .fc-daygrid-body tr:first-child .fc-daygrid-day { border-top: none !important; }
+    .fc-daygrid-event.occ-leave-label { background-color: var(--occ-label-bg) !important; border: none !important; color: var(--occ-label-text) !important; font-size: 11px !important; font-weight: bold; text-align: center; padding: 3px 4px; margin: 1px 2px 0 2px; border-radius: 6px; }
+    .occ-leave-label .fc-event-title, .occ-leave-label .fc-event-main { color: var(--occ-label-text) !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .occ-leave-label .fc-daygrid-event-dot { display: none; }
 
     .card-custom { background: white; border-radius: 24px; box-shadow: 0 8px 24px rgba(11, 75, 95, 0.06); border: none; padding: 20px; margin-bottom: 16px; }
@@ -218,7 +221,7 @@
             <textarea id="leave-memo" class="form-control" rows="3" placeholder="如：公出參訪/度假囉!/心情不美麗/身體不適..."></textarea>
           </div>
 
-          <button class="btn w-100 py-2 text-white fw-bold" id="reserve-submit-btn" style="background-color: var(--pantone-dark-sea); border-radius:6px;" onclick="submitReserveForm()">送出預定</button>
+          <button class="btn w-100 py-2 text-white fw-bold" id="reserve-submit-btn" style="background: var(--brand-gradient); border-radius:12px;" onclick="submitReserveForm()">送出預定</button>
           <button class="btn w-100 py-2 mt-2 text-secondary fw-bold" id="reserve-cancel-btn" style="display:none; border-radius:12px;" onclick="cancelEditReserve()">取消編輯</button>
         </div>
       </div>
@@ -310,7 +313,7 @@
         </div>
         <div class="modal-body">
           <div id="dayDetailList" class="mb-3"></div>
-          <button class="btn w-100 py-2 text-white fw-bold" style="background-color: var(--pantone-turquoise); border-radius:12px;" onclick="openQuickLeaveModalFromDay()"><i class="fa-solid fa-plus me-1"></i>登記請假</button>
+          <button class="btn w-100 py-2 text-white fw-bold" style="background: var(--brand-gradient); border-radius:12px;" onclick="openQuickLeaveModalFromDay()"><i class="fa-solid fa-plus me-1"></i>登記請假</button>
         </div>
       </div>
     </div>
@@ -351,7 +354,7 @@
             <label class="small text-secondary mb-1">事由/備註(選填)</label>
             <input type="text" id="q-leave-memo" class="form-control" placeholder="如：公出參訪/度假囉!/心情不美麗/身體不適...">
           </div>
-          <button class="btn w-100 py-2 text-white fw-bold" style="background-color: var(--pantone-turquoise); border-radius:12px;" onclick="submitQuickLeave()">確認送出假單</button>
+          <button class="btn w-100 py-2 text-white fw-bold" style="background: var(--brand-gradient); border-radius:12px;" onclick="submitQuickLeave()">確認送出假單</button>
         </div>
       </div>
     </div>
@@ -379,10 +382,9 @@
       bindDateAutoClose();
       if (currentUser) {
         applyAdminUI();
-        await fetchUserList();
+        await Promise.all([fetchUserList(), fetchAllLeaves()]);
         fillUserPicker();
         fillDelegateSelects();
-        await fetchAllLeaves();
       }
       try { initLazyPickers(); } catch (e) { console.error("選取器載入失敗", e); }
     });
@@ -495,11 +497,17 @@
       }
     }
 
+    function setThemeColor(color) {
+      const meta = document.querySelector('meta[name="theme-color"]');
+      if (meta) meta.setAttribute('content', color);
+    }
+
     function showMainApp() {
       document.getElementById('section-login').style.display = 'none';
       document.getElementById('main-application').style.display = 'block';
       document.getElementById('user-greeting').innerText = currentUser ? currentUser.name : '同仁';
       applyAdminUI();
+      setThemeColor('#1B4B5A');
       setTimeout(() => { if (typeof initCalendar === 'function') initCalendar(); }, 300);
     }
 
@@ -522,6 +530,7 @@
       else {
         document.getElementById('section-login').style.display = 'block';
         document.getElementById('main-application').style.display = 'none';
+        setThemeColor('#9AD5EC');
       }
     }
 
@@ -535,16 +544,15 @@
       fetch(GOOGLE_SHEET_API, { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: formData.toString() })
         .then(res => res.json())
         .then(async data => {
-          showLoading(false);
           if (data.status === "success") {
             currentUser = { account: data.account, name: data.name, title: data.title, isAdmin: data.title === "管理員" };
             localStorage.setItem('occ_user', JSON.stringify(currentUser));
             showMainApp();
-            await fetchUserList();
+            await Promise.all([fetchUserList(), fetchAllLeaves()]);
             fillUserPicker();
             fillDelegateSelects();
-            await fetchAllLeaves();
           } else { alert(data.message || "登入失敗"); }
+          showLoading(false);
         })
         .catch(err => { showLoading(false); console.error(err); alert("登入失敗，請稍後再試"); });
     }
@@ -580,13 +588,24 @@
       return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     }
     function buildFcEvents() {
-      return mockDb.map(item => ({
-        title: item.name,
-        start: item.startDate,
-        end: addDaysToDateStr(item.endDate || item.startDate, 1), // FullCalendar 全天事件 end 為不包含結束日，要 +1 天
-        allDay: true,
-        classNames: ['occ-leave-label']
-      }));
+      const events = [];
+      mockDb.forEach(item => {
+        let cur = item.startDate;
+        const end = item.endDate || item.startDate;
+        let guard = 0;
+        while (cur <= end && guard < 366) {
+          events.push({
+            title: item.name,
+            start: cur,
+            end: addDaysToDateStr(cur, 1),
+            allDay: true,
+            classNames: ['occ-leave-label']
+          });
+          cur = addDaysToDateStr(cur, 1);
+          guard++;
+        }
+      });
+      return events;
     }
 
     function initCalendar() {
@@ -947,11 +966,14 @@
       if (!el) return;
       el.innerHTML = "<div style='height:36px;'></div>";
       const now = new Date();
+      const launch = new Date(2026, 6, 1); // 2026年7月：APP 啟用月份，不需要看更早的
       const months = [];
-      for (let i = -12; i <= 12; i++) {
-        const d = new Date(now.getFullYear(), now.getMonth() + i, 1);
-        const y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0');
-        months.push({ value: `${y}-${m}`, label: `${y}年${d.getMonth() + 1}月` });
+      let cursor = new Date(launch.getFullYear(), launch.getMonth(), 1);
+      const endCursor = new Date(now.getFullYear(), now.getMonth() + 12, 1);
+      while (cursor <= endCursor) {
+        const y = cursor.getFullYear(), m = String(cursor.getMonth() + 1).padStart(2, '0');
+        months.push({ value: `${y}-${m}`, label: `${y}年${cursor.getMonth() + 1}月` });
+        cursor.setMonth(cursor.getMonth() + 1);
       }
       const curValue = thisMonthStr();
       let selectedIndex = 0;
