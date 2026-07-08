@@ -31,6 +31,13 @@
       font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
       margin: 0; padding-bottom: 85px; user-select: none;
     }
+    /* 限制彈出視窗內容高度，強迫超出時可在內部滾動，且不擋到下方按鈕 */
+    .modal-scroll-area {
+      max-height: 60vh; /* 限制最高為螢幕高度的 60% */
+      overflow-y: auto;  /* 允許上下滑動 */
+      padding: 4px 16px 16px 16px;
+      -webkit-overflow-scrolling: touch; /* 讓 iPhone 滑動更順暢 */
+    }
     /* ===== 登入畫面 ===== */
     .login-page-bg {
       min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center;
@@ -66,7 +73,36 @@
     .fc { width: 100% !important; table-layout: fixed; background: white; border-radius: 24px; padding: 16px 8px; box-shadow: 0 4px 20px rgba(17, 75, 95, 0.04); border: none !important; }
     .fc-theme-standard td, .fc-theme-standard th, .fc-theme-standard .fc-scrollgrid { border: none !important; }
     /* 自訂月曆標題列：箭頭與年月標題強制同一排，切換鈕改用淺色 */
-    .custom-cal-header { display: flex; align-items: center; gap: 8px; padding: 4px 6px 14px 6px; }
+    /* 更新日曆自訂標題列佈局 */
+    .custom-cal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #FFFFFF;
+      padding: 8px 12px;
+      border-bottom: 1px solid #E2E8F0;
+    }
+    .custom-cal-left {
+      width: 25%;
+      display: flex;
+      justify-content: flex-start;
+    }
+    .custom-cal-center {
+      width: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+    .custom-cal-right {
+      width: 25%;
+    }
+    .custom-cal-title {
+      font-size: 16px;
+      font-weight: bold;
+      color: var(--pantone-navy);
+      margin: 0;
+    }
     .cal-nav-btn { width: 32px; height: 32px; flex-shrink: 0; border-radius: 50%; border: none; background: #eaf3f3; color: var(--pantone-navy); font-size: 13px; display: flex; align-items: center; justify-content: center; }
     .cal-nav-btn:active { background: #d9ecec; }
     .cal-title { font-size: 19px; font-weight: 800; color: var(--pantone-navy); white-space: nowrap; }
@@ -79,7 +115,7 @@
     .fc-daygrid-day.fc-day-today .fc-daygrid-day-frame { background-color: var(--occ-green-bg) !important; border-radius: 6px !important; border: none !important; }
     .fc-daygrid-day { height: 95px !important; cursor: pointer; box-shadow: inset 0 1px 0 0 #e2e5e5; }
     .fc-daygrid-body tr:first-child .fc-daygrid-day { box-shadow: none !important; }
-    .fc-daygrid-event.occ-leave-label { background-color: var(--occ-label-bg) !important; border: none !important; color: var(--occ-label-text) !important; font-size: 11px !important; font-weight: bold; text-align: center; padding: 3px 3px; margin: 1px 2px 0 2px; border-radius: 6px; }
+    .fc-daygrid-event.occ-leave-label { background-color: var(--occ-label-bg) !important; border: none !important; color: var(--occ-label-text) !important; font-size: 11px !important; font-weight: bold; text-align: center; padding: 1px 2px; margin: 1px 1px 0 2px; border-radius: 6px; }
     .occ-leave-label .fc-event-title, .occ-leave-label .fc-event-main { color: var(--occ-label-text) !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .occ-leave-label .fc-daygrid-event-dot { display: none; }
 
@@ -170,13 +206,16 @@
       <!-- 首頁：月曆 -->
       <div id="sect-home" class="app-section active">
         <div class="custom-cal-header">
-          <button class="cal-nav-btn" onclick="calendar.prev()"><i class="fa-solid fa-chevron-left"></i></button>
-          <span class="cal-title" id="cal-title-text"></span>
-          <button class="cal-nav-btn" onclick="calendar.next()"><i class="fa-solid fa-chevron-right"></i></button>
-          <button class="cal-today-btn" onclick="calendar.today()">回到今天</button>
+          <div class="custom-cal-left">
+            <button class="btn-cal-action" id="custom-today-btn">TODAY</button>
+          </div>
+          <div class="custom-cal-center">
+            <button class="btn-cal-arrow" id="custom-prev-btn"><i class="fa-solid fa-chevron-left"></i></button>
+            <span class="custom-cal-title" id="custom-cal-title-text"></span>
+            <button class="btn-cal-arrow" id="custom-next-btn"><i class="fa-solid fa-chevron-right"></i></button>
+          </div>
+          <div class="custom-cal-right"></div>
         </div>
-        <div id="calendar"></div>
-      </div>
 
       <!-- 預定請假 -->
       <div id="sect-reserve" class="app-section">
@@ -398,6 +437,13 @@
     let userList = [];
     let editingLeaveId = null;
     let currentDayDetailDate = null;
+    
+    // 1. 強制將 GAS 傳回的 yyyy-MM-dd 補上台北時區後置，防止被 JS 以 UTC 讀取少 8 小時
+    function parseLocalDateString(dateStr) {
+      if (!dateStr) return null;
+      let cleaned = dateStr.split('T')[0];
+      return cleaned + "T00:00:00+08:00"; 
+    }
 
     document.addEventListener("DOMContentLoaded", async function() {
       checkLoginState();
@@ -452,8 +498,15 @@
     }
     function rangeOverlapsDate(item, dateStr) {
       const end = item.endDate || item.startDate;
-      return dateStr >= item.startDate && dateStr <= end;
+      
+      // 將所有比對基準點都強制轉為台北時區的時間戳記進行純數字比對，最安全
+      const startTIme = new Date(parseLocalDateString(item.startDate)).getTime();
+      const endTime = new Date(parseLocalDateString(end)).getTime();
+      const targetTime = new Date(parseLocalDateString(dateStr)).getTime();
+      
+      return targetTime >= startTIme && targetTime <= endTime;
     }
+    
     // 保護性清理：不管後端有沒有正確格式化，前端一律把可能夾帶的 ISO 時間字串清乾淨
     function cleanDateStr(v) {
       if (!v) return v;
@@ -619,17 +672,23 @@
           events.push({
             title: item.name,
             start: cur,
-            end: addDaysToDateStr(cur, 1),
+            // FullCalendar 的 end 是「不包含（Exclusive）」，
+            // 加上你原本寫的 addDaysToDateStr(cur, 1) 在手機上可能解析失敗，
+            // 這裡直接給 cur，並讓 allDay: true 就能完美、精準地填滿當天格子
+            end: cur,
             allDay: true,
             classNames: ['occ-leave-label']
           });
-          cur = addDaysToDateStr(cur, 1);
+          
+          // 使用安全的台北時區物件操作來遞增天數
+          const nextD = new Date(parseLocalDateString(cur));
+          nextD.setDate(nextD.getDate() + 1);
+          cur = `${nextD.getFullYear()}-${String(nextD.getMonth()+1).padStart(2,'0')}-${String(nextD.getDate()).padStart(2,'0')}`;
           guard++;
         }
       });
       return events;
     }
-
     function initCalendar() {
       const calEl = document.getElementById('calendar'); if (!calEl) return;
       calendar = new FullCalendar.Calendar(calEl, {
