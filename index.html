@@ -221,7 +221,7 @@
             <textarea id="leave-memo" class="form-control" rows="3" placeholder="如：公出參訪/度假囉!/身體不適..."></textarea>
           </div>
 
-          <button class="btn w-100 py-2 text-white fw-bold" id="reserve-submit-btn" style="background: var(--brand-gradient); border-radius:12px;" onclick="submitReserveForm()">送出預定</button>
+          <button class="btn w-100 py-2 text-white fw-bold" id="reserve-submit-btn" style="background: var(--brand-gradient); border-radius:12px;" onclick="submitReserveForm()">送出</button>
           <button class="btn w-100 py-2 mt-2 text-secondary fw-bold" id="reserve-cancel-btn" style="display:none; border-radius:12px;" onclick="cancelEditReserve()">取消編輯</button>
         </div>
       </div>
@@ -626,7 +626,7 @@
     function initCalendar() {
       const calEl = document.getElementById('calendar'); if (!calEl) return;
       calendar = new FullCalendar.Calendar(calEl, {
-        initialView: 'dayGridMonth', locale: 'zh-tw', height: 'auto',
+        initialView: 'dayGridMonth', locale: 'en', height: 'auto',
         headerToolbar: false,
         dayCellContent: function(arg) { return String(arg.date.getDate()); },
         datesSet: function(info) {
