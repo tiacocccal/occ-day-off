@@ -913,7 +913,7 @@
       else if (mode === 'seluser') {
         const u = getWheelValue('picker-ov-user');
         if (!u || u === '請選擇') { container.innerHTML = "<p class='text-muted text-center py-3 small'>請先滑動選擇人員</p>"; return; }
-        filtered = mockDb.filter(d => d.name === u); title = `<h6> (${u}) 查詢結果：</h6>`;
+        filtered = mockDb.filter(d => d.name === u); title = `<h6> ${u} 查詢結果：</h6>`;
       }
 
       if (filtered.length === 0) { container.innerHTML = title + "<p class='text-muted text-center py-3 small'>無請假紀錄</p>"; }
