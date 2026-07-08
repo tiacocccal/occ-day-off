@@ -55,13 +55,13 @@
     .status-bar { background-color: white; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #EAEAEA; }
     .user-greeting-box { font-size: 17px; font-weight: 800; color: var(--pantone-navy); }
     .admin-badge { background-color: #FFEBEB; color: #FF4D4D; font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: bold; margin-left: 6px; }
-    .occ-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; padding-bottom: env(safe-area-inset-bottom, 0px); background: white; box-shadow: 0 -3px 12px rgba(0,0,0,0.04); display: flex; justify-content: space-around; align-items: center; z-index: 1000; box-sizing: content-box; }
-    .footer-item { display: flex; flex-direction: column; align-items: center; color: #8c9ba5; font-size: 11px; background: none; border: none; width: 25%; }
+    .occ-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; padding-bottom: env(safe-area-inset-bottom, 0px); background: white; box-shadow: 0 -3px 12px rgba(0,0,0,0.04); display: flex; justify-content: space-around; align-items: flex-start; z-index: 1000; box-sizing: content-box; }
+    .footer-item { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 65px; color: #8c9ba5; font-size: 11px; background: none; border: none; width: 25%; }
     .footer-item.active { color: var(--pantone-dark-sea); font-weight: bold; }
     .footer-item i { font-size: 20px; margin-bottom: 2px; }
 
     /* ===== 月曆（圖2風格：圓弧日期格、數字不加「日」、箭頭與年月同排） ===== */
-    .calendar-container { padding: 10px; width: 100%; box-sizing: border-box; overflow: hidden; }
+    .calendar-container { padding: 10px; width: 100%; box-sizing: border-box; overflow-x: hidden; }
     #calendar { width: 100%; max-width: 100%; margin: 0 auto; }
     .fc { width: 100% !important; table-layout: fixed; background: white; border-radius: 24px; padding: 16px 8px; box-shadow: 0 4px 20px rgba(17, 75, 95, 0.04); border: none !important; }
     .fc-theme-standard td, .fc-theme-standard th, .fc-theme-standard .fc-scrollgrid { border: none !important; }
@@ -71,14 +71,14 @@
     .cal-nav-btn:active { background: #d9ecec; }
     .cal-title { font-size: 19px; font-weight: 800; color: var(--pantone-navy); white-space: nowrap; }
     .cal-today-btn { margin-left: auto; padding: 6px 14px; border-radius: 16px; background: white; color: var(--pantone-dark-sea); border: 1.5px solid var(--pantone-dark-sea); font-weight: 700; font-size: 13px; }
-    .fc-col-header-cell-cushion { text-decoration: none !important; color: var(--pantone-navy) !important; pointer-events: none; font-weight: 600; }
+    .fc-col-header-cell-cushion { text-decoration: none !important; color: var(--pantone-navy) !important; pointer-events: none; font-weight: 600; font-size: 11px; letter-spacing: 0.5px; }
     .fc-daygrid-day-frame { border-radius: 14px; margin: 2px; }
     .fc-daygrid-day-top { justify-content: center; padding-top: 4px; }
     .fc-daygrid-day-number { text-decoration: none !important; color: var(--pantone-navy) !important; font-weight: 600; font-size: 13px; pointer-events: none; }
     .fc-daygrid-day.fc-day-today { background-color: transparent !important; }
     .fc-daygrid-day.fc-day-today .fc-daygrid-day-frame { background-color: var(--occ-green-bg) !important; border-radius: 6px !important; border: none !important; }
-    .fc-daygrid-day { height: 95px !important; cursor: pointer; border-top: 1px solid #eef0f0 !important; }
-    .fc-daygrid-body tr:first-child .fc-daygrid-day { border-top: none !important; }
+    .fc-daygrid-day { height: 95px !important; cursor: pointer; box-shadow: inset 0 1px 0 0 #e2e5e5; }
+    .fc-daygrid-body tr:first-child .fc-daygrid-day { box-shadow: none !important; }
     .fc-daygrid-event.occ-leave-label { background-color: var(--occ-label-bg) !important; border: none !important; color: var(--occ-label-text) !important; font-size: 11px !important; font-weight: bold; text-align: center; padding: 3px 3px; margin: 1px 2px 0 2px; border-radius: 6px; }
     .occ-leave-label .fc-event-title, .occ-leave-label .fc-event-main { color: var(--occ-label-text) !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .occ-leave-label .fc-daygrid-event-dot { display: none; }
@@ -223,6 +223,7 @@
 
           <button class="btn w-100 py-2 text-white fw-bold" id="reserve-submit-btn" style="background: var(--brand-gradient); border-radius:12px;" onclick="submitReserveForm()">送出</button>
           <button class="btn w-100 py-2 mt-2 text-secondary fw-bold" id="reserve-cancel-btn" style="display:none; border-radius:12px;" onclick="cancelEditReserve()">取消編輯</button>
+          <div style="height: 30px;"></div>
         </div>
       </div>
 
@@ -369,7 +370,13 @@
     (function cleanupOldServiceWorker() {
       if ('serviceWorker' in navigator) {
         navigator.serviceWorker.getRegistrations().then(function(regs) {
-          regs.forEach(function(reg) { reg.unregister(); });
+          if (regs.length > 0) {
+            regs.forEach(function(reg) { reg.unregister(); });
+            if (navigator.serviceWorker.controller && !sessionStorage.getItem('occ_sw_cleaned')) {
+              sessionStorage.setItem('occ_sw_cleaned', '1');
+              window.location.reload();
+            }
+          }
         }).catch(function(){});
       }
       if (window.caches) {
@@ -626,9 +633,13 @@
     function initCalendar() {
       const calEl = document.getElementById('calendar'); if (!calEl) return;
       calendar = new FullCalendar.Calendar(calEl, {
-        initialView: 'dayGridMonth', locale: 'en', height: 'auto',
+        initialView: 'dayGridMonth', locale: 'zh-tw', height: 'auto',
         headerToolbar: false,
         dayCellContent: function(arg) { return String(arg.date.getDate()); },
+        dayHeaderContent: function(arg) {
+          const map = ['SUN','MON','TUE','WED','THU','FRI','SAT'];
+          return map[arg.date.getDay()];
+        },
         datesSet: function(info) {
           const titleEl = document.getElementById('cal-title-text');
           if (titleEl) titleEl.innerText = info.view.title;
@@ -901,6 +912,7 @@
       }
       else if (mode === 'seluser') {
         const u = getWheelValue('picker-ov-user');
+        if (!u || u === '請選擇') { container.innerHTML = "<p class='text-muted text-center py-3 small'>請先滑動選擇人員</p>"; return; }
         filtered = mockDb.filter(d => d.name === u); title = `<h6> (${u}) 查詢結果：</h6>`;
       }
 
@@ -1016,9 +1028,13 @@
       const uEl = document.getElementById('picker-ov-user');
       if (!uEl) return;
       uEl.innerHTML = "<div style='height:36px;'></div>";
-      userList.forEach((u, i) => {
+      const placeholder = document.createElement('div');
+      placeholder.className = 'ios-picker-item selected';
+      placeholder.innerText = '請選擇';
+      uEl.appendChild(placeholder);
+      userList.forEach((u) => {
         let item = document.createElement('div');
-        item.className = 'ios-picker-item' + (i === 0 ? ' selected' : '');
+        item.className = 'ios-picker-item';
         item.innerText = u;
         uEl.appendChild(item);
       });
