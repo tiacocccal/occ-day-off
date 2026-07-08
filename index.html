@@ -13,17 +13,17 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
   <style>
     :root {
-      --pantone-turquoise: #1FA398;
-      --pantone-dark-sea: #146B72;
-      --pantone-navy: #123C46;
-      --pantone-light-bg: #F1FAF8;
-      --occ-green-bg: #DCF3EE;
-      --occ-green-border: #1FA398;
-      --occ-label-bg: #3FA79C;
-      --occ-label-text: #FFFFFF;
-      --brand-sky: #BEE9E3;
-      --brand-peach: #2EC4B6;
-      --brand-gradient: linear-gradient(90deg, #2EC4B6 0%, #146B72 100%);
+      --pantone-turquoise: #5C93A5;
+      --pantone-dark-sea: #6B8FA0;
+      --pantone-navy: #4C6F94;
+      --pantone-light-bg: #F5F2EC;
+      --occ-green-bg: #E6EBEF;
+      --occ-green-border: #A9C0D4;
+      --occ-label-bg: #D2A85C;
+      --occ-label-text: #4A3312;
+      --brand-sky: #C6D9E8;
+      --brand-peach: #6B8FA0;
+      --brand-gradient: linear-gradient(90deg, #A9C4DA 0%, #6B8FA0 100%);
     }
     html, body { height: 100%; }
     body {
@@ -35,7 +35,7 @@
     .login-page-bg {
       min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center;
       padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom)) 20px;
-      background: linear-gradient(180deg, #BEE9E3 0%, #F6FDFC 100%);
+      background: linear-gradient(180deg, #C6D9E8 0%, #F5F2EC 100%);
     }
     .login-card-custom {
       background: rgba(255, 255, 255, 0.95); border-radius: 24px; padding: 24px;
@@ -53,7 +53,7 @@
     .navbar-brand-box { display: flex; align-items: center; gap: 8px; font-size: 19px; font-weight: bold; }
     .navbar-brand-box img { max-height: 28px; width: auto; object-fit: contain; }
     .status-bar { background-color: white; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #EAEAEA; }
-    .user-greeting-box { font-size: 17px; font-weight: 800; color: #028090; }
+    .user-greeting-box { font-size: 17px; font-weight: 800; color: var(--pantone-navy); }
     .admin-badge { background-color: #FFEBEB; color: #FF4D4D; font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: bold; margin-left: 6px; }
     .occ-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; padding-bottom: env(safe-area-inset-bottom, 0px); background: white; box-shadow: 0 -3px 12px rgba(0,0,0,0.04); display: flex; justify-content: space-around; align-items: center; z-index: 1000; box-sizing: content-box; }
     .footer-item { display: flex; flex-direction: column; align-items: center; color: #8c9ba5; font-size: 11px; background: none; border: none; width: 25%; }
@@ -364,8 +364,23 @@
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
   <script>
+    // 清掉過去(Gemini時期)註冊過的舊 Service Worker 與快取，
+    // 確保「加入主畫面」的捷徑一定會抓最新版本，不會被卡在舊版本裡出不來
+    (function cleanupOldServiceWorker() {
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(function(regs) {
+          regs.forEach(function(reg) { reg.unregister(); });
+        }).catch(function(){});
+      }
+      if (window.caches) {
+        caches.keys().then(function(names) {
+          names.forEach(function(name) { caches.delete(name); });
+        }).catch(function(){});
+      }
+    })();
+
     // ===== 全域變數 =====
-    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbwIyXv5zFKqi2E5aZQCA-XsjiAV80YVIl1IgGDCd25pCUdn8j7cPzxsWxqJl6Ixt9DS6w/exec";
+    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbwlVjzFZmm10w7P_OJo51CHx1XBU-uv1wm_JQhHxE82E5A_sCJux9kOqBqhljXbwWYVnw/exec";
     let calendar = null;
     let currentUser = null;      // { account, name, title, isAdmin }
     let selectedLeaveType = 'full';
@@ -507,7 +522,7 @@
       document.getElementById('main-application').style.display = 'block';
       document.getElementById('user-greeting').innerText = currentUser ? currentUser.name : '同仁';
       applyAdminUI();
-      setThemeColor('#123C46');
+      setThemeColor('#4C6F94');
       setTimeout(() => { if (typeof initCalendar === 'function') initCalendar(); }, 300);
     }
 
@@ -530,7 +545,7 @@
       else {
         document.getElementById('section-login').style.display = 'block';
         document.getElementById('main-application').style.display = 'none';
-        setThemeColor('#BEE9E3');
+        setThemeColor('#C6D9E8');
       }
     }
 
