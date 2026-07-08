@@ -19,8 +19,8 @@
       --pantone-light-bg: #F5F2EC;
       --occ-green-bg: #E6EBEF;
       --occ-green-border: #A9C0D4;
-      --occ-label-bg: #D2A85C;
-      --occ-label-text: #4A3312;
+      --occ-label-bg: #79B5DB;
+      --occ-label-text: #2D363F;
       --brand-sky: #C6D9E8;
       --brand-peach: #6B8FA0;
       --brand-gradient: linear-gradient(90deg, #A9C4DA 0%, #6B8FA0 100%);
@@ -58,7 +58,7 @@
     .occ-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; padding-bottom: env(safe-area-inset-bottom, 0px); background: white; box-shadow: 0 -3px 12px rgba(0,0,0,0.04); display: flex; justify-content: space-around; align-items: center; z-index: 1000; box-sizing: content-box; }
     .footer-item { display: flex; flex-direction: column; align-items: center; color: #8c9ba5; font-size: 11px; background: none; border: none; width: 25%; }
     .footer-item.active { color: var(--pantone-dark-sea); font-weight: bold; }
-    .footer-item i { font-size: 20px; margin-bottom: 3px; }
+    .footer-item i { font-size: 20px; margin-bottom: 2px; }
 
     /* ===== 月曆（圖2風格：圓弧日期格、數字不加「日」、箭頭與年月同排） ===== */
     .calendar-container { padding: 10px; width: 100%; box-sizing: border-box; overflow: hidden; }
@@ -218,7 +218,7 @@
 
           <div class="mb-4">
             <label class="small text-secondary mb-1">事由/備註(選填)</label>
-            <textarea id="leave-memo" class="form-control" rows="3" placeholder="如：公出參訪/度假囉!/心情不美麗/身體不適..."></textarea>
+            <textarea id="leave-memo" class="form-control" rows="3" placeholder="如：公出參訪/度假囉!/身體不適..."></textarea>
           </div>
 
           <button class="btn w-100 py-2 text-white fw-bold" id="reserve-submit-btn" style="background: var(--brand-gradient); border-radius:12px;" onclick="submitReserveForm()">送出預定</button>
@@ -352,7 +352,7 @@
           </div>
           <div class="mb-4">
             <label class="small text-secondary mb-1">事由/備註(選填)</label>
-            <input type="text" id="q-leave-memo" class="form-control" placeholder="如：公出參訪/度假囉!/心情不美麗/身體不適...">
+            <input type="text" id="q-leave-memo" class="form-control" placeholder="如：公出參訪/度假囉!/身體不適...">
           </div>
           <button class="btn w-100 py-2 text-white fw-bold" style="background: var(--brand-gradient); border-radius:12px;" onclick="submitQuickLeave()">確認送出假單</button>
         </div>
