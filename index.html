@@ -49,14 +49,17 @@
     .password-toggle-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); cursor: pointer; color: #a0b0b5; z-index: 10; }
 
     /* ===== Header / Footer ===== */
-    .occ-navbar { background-color: var(--pantone-navy); color: white; padding: 14px 16px; padding-top: max(14px, env(safe-area-inset-top)); display: flex; justify-content: space-between; align-items: center; }
+    #sticky-header-group { position: sticky; top: 0; z-index: 1000; }
+    .occ-navbar { background-color: var(--pantone-navy); color: white; padding: 14px 16px; padding-top: max(14px, env(safe-area-inset-top)); display: flex; justify-content: center; align-items: center; }
     .navbar-brand-box { display: flex; align-items: center; gap: 8px; font-size: 19px; font-weight: bold; }
     .navbar-brand-box img { max-height: 28px; width: auto; object-fit: contain; }
-    .status-bar { background-color: white; padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #EAEAEA; }
-    .user-greeting-box { font-size: 17px; font-weight: 800; color: var(--pantone-navy); }
+    .status-bar { background-color: var(--pantone-navy); padding: 8px 16px 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: none; }
+    .user-greeting-box { font-size: 15px; font-weight: 700; color: white; }
+    .custom-cal-header { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px 6px; background: var(--pantone-light-bg); }
+    .cal-today-btn { padding: 4px 10px; border-radius: 14px; background: var(--pantone-light-bg); color: var(--pantone-dark-sea); border: 1.5px solid var(--pantone-dark-sea); font-weight: 700; font-size: 11px; flex-shrink: 0; }
     .admin-badge { background-color: #FFEBEB; color: #FF4D4D; font-size: 11px; padding: 2px 8px; border-radius: 6px; font-weight: bold; margin-left: 6px; }
-    .occ-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; padding-bottom: env(safe-area-inset-bottom, 0px); background: white; box-shadow: 0 -3px 12px rgba(0,0,0,0.04); display: flex; justify-content: space-around; align-items: flex-start; z-index: 1000; box-sizing: content-box; }
-    .footer-item { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 65px; color: #8c9ba5; font-size: 11px; background: none; border: none; width: 25%; }
+    .occ-footer { position: fixed; bottom: 0; left: 0; right: 0; height: 65px; background: white; box-shadow: 0 -3px 12px rgba(0,0,0,0.04); display: flex; justify-content: space-around; align-items: center; z-index: 1000; }
+    .footer-item { display: flex; flex-direction: column; align-items: center; justify-content: center; color: #8c9ba5; font-size: 11px; background: none; border: none; width: 25%; height: 100%; }
     .footer-item.active { color: var(--pantone-dark-sea); font-weight: bold; }
     .footer-item i { font-size: 20px; margin-bottom: 2px; }
 
@@ -70,7 +73,6 @@
     .cal-nav-btn { width: 32px; height: 32px; flex-shrink: 0; border-radius: 50%; border: none; background: #eaf3f3; color: var(--pantone-navy); font-size: 13px; display: flex; align-items: center; justify-content: center; }
     .cal-nav-btn:active { background: #d9ecec; }
     .cal-title { font-size: 19px; font-weight: 800; color: var(--pantone-navy); white-space: nowrap; }
-    .cal-today-btn { padding: 6px 14px; border-radius: 16px; background: white; color: var(--pantone-dark-sea); border: 1.5px solid var(--pantone-dark-sea); font-weight: 700; font-size: 13px; flex-shrink: 0; }
     .fc-col-header-cell-cushion { text-decoration: none !important; color: var(--pantone-navy) !important; pointer-events: none; font-weight: 600; font-size: 11px; letter-spacing: 0.5px; }
     .fc-daygrid-day-frame { border-radius: 14px; margin: 2px; }
     .fc-daygrid-day-top { justify-content: center; padding-top: 4px; }
@@ -147,33 +149,34 @@
 
   <!-- 主應用程式 -->
   <div id="main-application" style="display: none;">
-    <div class="occ-navbar">
-      <div class="navbar-brand-box" id="nav-brand-box">
-        <span><i class="fa-solid fa-umbrella-beach"></i> OCC 休假表</span> 
+    <div id="sticky-header-group">
+      <div class="occ-navbar">
+        <div class="navbar-brand-box" id="nav-brand-box">
+          <span><i class="fa-solid fa-umbrella-beach"></i> OCC 休假表</span>
+        </div>
       </div>
-      <div>
-        <button class="btn btn-sm btn-outline-light me-1" onclick="openChangePasswordModal()">改密碼</button>
-        <button class="btn btn-sm btn-light fw-bold" onclick="handleLogout()">登出</button>
+      <div class="status-bar">
+        <div class="user-greeting-box">
+          <i class="fa-solid fa-plane"></i> HELLO <span id="user-greeting">同仁</span>
+          <span class="admin-badge" id="admin-shield" style="display:none;"><i class="fa-solid fa-user-gear"></i> 管理員模式</span>
+        </div>
+        <div>
+          <button class="btn btn-sm btn-outline-light me-1" onclick="openChangePasswordModal()">改密碼</button>
+          <button class="btn btn-sm btn-light fw-bold" onclick="handleLogout()">登出</button>
+        </div>
+      </div>
+      <div class="custom-cal-header" id="home-sticky-cal-header" style="display:flex;">
+        <button class="cal-nav-btn" onclick="calendar.prev()"><i class="fa-solid fa-chevron-left"></i></button>
+        <span class="cal-title" id="cal-title-text"></span>
+        <button class="cal-nav-btn" onclick="calendar.next()"><i class="fa-solid fa-chevron-right"></i></button>
+        <button class="cal-today-btn" id="home-today-btn" onclick="calendar.today()">回到今天</button>
       </div>
     </div>
-    <div class="status-bar">
-      <div class="user-greeting-box">
-        <i class="fa-solid fa-plane"></i> HELLO <span id="user-greeting">同仁</span>
-        <span class="admin-badge" id="admin-shield" style="display:none;"><i class="fa-solid fa-user-gear"></i> 管理員模式</span>
-      </div>
-      <button class="cal-today-btn" id="home-today-btn" onclick="calendar.today()" style="display:none;">回到今天</button>
-    </div>
-    
 
     <div class="container-fluid calendar-container">
 
       <!-- 首頁：月曆 -->
       <div id="sect-home" class="app-section active">
-        <div class="custom-cal-header">
-          <button class="cal-nav-btn" onclick="calendar.prev()"><i class="fa-solid fa-chevron-left"></i></button>
-          <span class="cal-title" id="cal-title-text"></span>
-          <button class="cal-nav-btn" onclick="calendar.next()"><i class="fa-solid fa-chevron-right"></i></button>
-        </div>
         <div id="calendar"></div>
       </div>
 
@@ -386,7 +389,7 @@
     })();
 
     // ===== 全域變數 =====
-    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbwgKeRj7GOI3YhRZRl45ONgYFVlZUn1mjI4vTgqwU6GcFrcNdllKlztU17RufohOBJmAA/exec";
+    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbxk72FRcme5VpCsbzKI1GCBGHdBi5HtC9kKGPs028yGb1DsMA_uuggs_Ro9Xx-y83NOEw/exec";
     let calendar = null;
     let currentUser = null;      // { account, name, title, isAdmin }
     let selectedLeaveType = 'full';
@@ -950,11 +953,11 @@
       if (id === 'overview') { renderOverviewList(currentActiveFilter); }
       if (id !== 'reserve' && editingLeaveId) { cancelEditReserve(); }
 
-      const todayBtn = document.getElementById('home-today-btn');
+      const calHeader = document.getElementById('home-sticky-cal-header');
       if (id === 'home') {
-          todayBtn.style.display = 'inline-block';
+          calHeader.style.display = 'flex';
       } else {
-          todayBtn.style.display = 'none';
+          calHeader.style.display = 'none';
       }
     }
 
