@@ -25,18 +25,11 @@
       --brand-peach: #6B8FA0;
       --brand-gradient: linear-gradient(90deg, #A9C4DA 0%, #6B8FA0 100%);
     }
-    html, body { height: 100%; }
+    html, body { min-height: 100%; }
     body {
       background-color: var(--pantone-light-bg);
       font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
       margin: 0; padding-bottom: 85px; user-select: none;
-    }
-    /* 限制彈出視窗內容高度，強迫超出時可在內部滾動，且不擋到下方按鈕 */
-    .modal-scroll-area {
-      max-height: 60vh; /* 限制最高為螢幕高度的 60% */
-      overflow-y: auto;  /* 允許上下滑動 */
-      padding: 4px 16px 16px 16px;
-      -webkit-overflow-scrolling: touch; /* 讓 iPhone 滑動更順暢 */
     }
     /* ===== 登入畫面 ===== */
     .login-page-bg {
@@ -73,40 +66,11 @@
     .fc { width: 100% !important; table-layout: fixed; background: white; border-radius: 24px; padding: 16px 8px; box-shadow: 0 4px 20px rgba(17, 75, 95, 0.04); border: none !important; }
     .fc-theme-standard td, .fc-theme-standard th, .fc-theme-standard .fc-scrollgrid { border: none !important; }
     /* 自訂月曆標題列：箭頭與年月標題強制同一排，切換鈕改用淺色 */
-    /* 更新日曆自訂標題列佈局 */
-    .custom-cal-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #FFFFFF;
-      padding: 8px 12px;
-      border-bottom: 1px solid #E2E8F0;
-    }
-    .custom-cal-left {
-      width: 25%;
-      display: flex;
-      justify-content: flex-start;
-    }
-    .custom-cal-center {
-      width: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-    }
-    .custom-cal-right {
-      width: 25%;
-    }
-    .custom-cal-title {
-      font-size: 16px;
-      font-weight: bold;
-      color: var(--pantone-navy);
-      margin: 0;
-    }
+    .custom-cal-header { display: flex; align-items: center; justify-content: center; gap: 10px; padding: 4px 6px 14px 6px; }
     .cal-nav-btn { width: 32px; height: 32px; flex-shrink: 0; border-radius: 50%; border: none; background: #eaf3f3; color: var(--pantone-navy); font-size: 13px; display: flex; align-items: center; justify-content: center; }
     .cal-nav-btn:active { background: #d9ecec; }
     .cal-title { font-size: 19px; font-weight: 800; color: var(--pantone-navy); white-space: nowrap; }
-    .cal-today-btn { margin-left: auto; padding: 6px 14px; border-radius: 16px; background: white; color: var(--pantone-dark-sea); border: 1.5px solid var(--pantone-dark-sea); font-weight: 700; font-size: 13px; }
+    .cal-today-btn { padding: 6px 14px; border-radius: 16px; background: white; color: var(--pantone-dark-sea); border: 1.5px solid var(--pantone-dark-sea); font-weight: 700; font-size: 13px; flex-shrink: 0; }
     .fc-col-header-cell-cushion { text-decoration: none !important; color: var(--pantone-navy) !important; pointer-events: none; font-weight: 600; font-size: 11px; letter-spacing: 0.5px; }
     .fc-daygrid-day-frame { border-radius: 14px; margin: 2px; }
     .fc-daygrid-day-top { justify-content: center; padding-top: 4px; }
@@ -115,7 +79,7 @@
     .fc-daygrid-day.fc-day-today .fc-daygrid-day-frame { background-color: var(--occ-green-bg) !important; border-radius: 6px !important; border: none !important; }
     .fc-daygrid-day { height: 95px !important; cursor: pointer; box-shadow: inset 0 1px 0 0 #e2e5e5; }
     .fc-daygrid-body tr:first-child .fc-daygrid-day { box-shadow: none !important; }
-    .fc-daygrid-event.occ-leave-label { background-color: var(--occ-label-bg) !important; border: none !important; color: var(--occ-label-text) !important; font-size: 11px !important; font-weight: bold; text-align: center; padding: 1px 2px; margin: 1px 1px 0 2px; border-radius: 6px; }
+    .fc-daygrid-event.occ-leave-label { background-color: var(--occ-label-bg) !important; border: none !important; color: var(--occ-label-text) !important; font-size: 11px !important; font-weight: bold; text-align: center; padding: 3px 1px; margin: 1px 2px 0 2px; border-radius: 6px; }
     .occ-leave-label .fc-event-title, .occ-leave-label .fc-event-main { color: var(--occ-label-text) !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .occ-leave-label .fc-daygrid-event-dot { display: none; }
 
@@ -197,7 +161,7 @@
         <i class="fa-solid fa-plane"></i> HELLO <span id="user-greeting">同仁</span>
         <span class="admin-badge" id="admin-shield" style="display:none;"><i class="fa-solid fa-user-gear"></i> 管理員模式</span>
       </div>
-      <div class="info-tip" id="home-info-tip"><i class="fa-light fa-lightbulb" style="color: rgb(255, 212, 59);"></i> 點選日期查看詳情</div>
+      <button class="cal-today-btn" id="home-today-btn" onclick="calendar.today()" style="display:none;">回到今天</button>
     </div>
     
 
@@ -206,16 +170,12 @@
       <!-- 首頁：月曆 -->
       <div id="sect-home" class="app-section active">
         <div class="custom-cal-header">
-          <div class="custom-cal-left">
-            <button class="btn-cal-action" id="custom-today-btn">TODAY</button>
-          </div>
-          <div class="custom-cal-center">
-            <button class="btn-cal-arrow" id="custom-prev-btn"><i class="fa-solid fa-chevron-left"></i></button>
-            <span class="custom-cal-title" id="custom-cal-title-text"></span>
-            <button class="btn-cal-arrow" id="custom-next-btn"><i class="fa-solid fa-chevron-right"></i></button>
-          </div>
-          <div class="custom-cal-right"></div>
+          <button class="cal-nav-btn" onclick="calendar.prev()"><i class="fa-solid fa-chevron-left"></i></button>
+          <span class="cal-title" id="cal-title-text"></span>
+          <button class="cal-nav-btn" onclick="calendar.next()"><i class="fa-solid fa-chevron-right"></i></button>
         </div>
+        <div id="calendar"></div>
+      </div>
 
       <!-- 預定請假 -->
       <div id="sect-reserve" class="app-section">
@@ -426,7 +386,7 @@
     })();
 
     // ===== 全域變數 =====
-    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbyKN82Foigtab4h-CiTM37KJIfuk-Q11t6JIdT-QrAE9MRdAzqJxyflnSxHD4CkAXuoHg/exec";
+    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbwlVjzFZmm10w7P_OJo51CHx1XBU-uv1wm_JQhHxE82E5A_sCJux9kOqBqhljXbwWYVnw/exec";
     let calendar = null;
     let currentUser = null;      // { account, name, title, isAdmin }
     let selectedLeaveType = 'full';
@@ -437,13 +397,6 @@
     let userList = [];
     let editingLeaveId = null;
     let currentDayDetailDate = null;
-    
-    // 1. 強制將 GAS 傳回的 yyyy-MM-dd 補上台北時區後置，防止被 JS 以 UTC 讀取少 8 小時
-    function parseLocalDateString(dateStr) {
-      if (!dateStr) return null;
-      let cleaned = dateStr.split('T')[0];
-      return cleaned + "T00:00:00+08:00"; 
-    }
 
     document.addEventListener("DOMContentLoaded", async function() {
       checkLoginState();
@@ -498,15 +451,8 @@
     }
     function rangeOverlapsDate(item, dateStr) {
       const end = item.endDate || item.startDate;
-      
-      // 將所有比對基準點都強制轉為台北時區的時間戳記進行純數字比對，最安全
-      const startTIme = new Date(parseLocalDateString(item.startDate)).getTime();
-      const endTime = new Date(parseLocalDateString(end)).getTime();
-      const targetTime = new Date(parseLocalDateString(dateStr)).getTime();
-      
-      return targetTime >= startTIme && targetTime <= endTime;
+      return dateStr >= item.startDate && dateStr <= end;
     }
-    
     // 保護性清理：不管後端有沒有正確格式化，前端一律把可能夾帶的 ISO 時間字串清乾淨
     function cleanDateStr(v) {
       if (!v) return v;
@@ -672,23 +618,17 @@
           events.push({
             title: item.name,
             start: cur,
-            // FullCalendar 的 end 是「不包含（Exclusive）」，
-            // 加上你原本寫的 addDaysToDateStr(cur, 1) 在手機上可能解析失敗，
-            // 這裡直接給 cur，並讓 allDay: true 就能完美、精準地填滿當天格子
-            end: cur,
+            end: addDaysToDateStr(cur, 1),
             allDay: true,
             classNames: ['occ-leave-label']
           });
-          
-          // 使用安全的台北時區物件操作來遞增天數
-          const nextD = new Date(parseLocalDateString(cur));
-          nextD.setDate(nextD.getDate() + 1);
-          cur = `${nextD.getFullYear()}-${String(nextD.getMonth()+1).padStart(2,'0')}-${String(nextD.getDate()).padStart(2,'0')}`;
+          cur = addDaysToDateStr(cur, 1);
           guard++;
         }
       });
       return events;
     }
+
     function initCalendar() {
       const calEl = document.getElementById('calendar'); if (!calEl) return;
       calendar = new FullCalendar.Calendar(calEl, {
@@ -972,7 +912,7 @@
       else if (mode === 'seluser') {
         const u = getWheelValue('picker-ov-user');
         if (!u || u === '請選擇') { container.innerHTML = "<p class='text-muted text-center py-3 small'>請先滑動選擇人員</p>"; return; }
-        filtered = mockDb.filter(d => d.name === u); title = `<h6> ${u} 查詢結果：</h6>`;
+        filtered = mockDb.filter(d => d.name === u); title = `<h6> (${u}) 查詢結果：</h6>`;
       }
 
       if (filtered.length === 0) { container.innerHTML = title + "<p class='text-muted text-center py-3 small'>無請假紀錄</p>"; }
@@ -1010,11 +950,11 @@
       if (id === 'overview') { renderOverviewList(currentActiveFilter); }
       if (id !== 'reserve' && editingLeaveId) { cancelEditReserve(); }
 
-      const tip = document.getElementById('home-info-tip');
+      const todayBtn = document.getElementById('home-today-btn');
       if (id === 'home') {
-          tip.style.display = 'block';
+          todayBtn.style.display = 'inline-block';
       } else {
-          tip.style.display = 'none';
+          todayBtn.style.display = 'none';
       }
     }
 
