@@ -386,7 +386,7 @@
     })();
 
     // ===== 全域變數 =====
-    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbxn1rq6JMQFvfYhUf9_XxoqRhLYu3vjSMSml_7sat4kRKiU6fnCf5aS2aEOuruhIV2q6A/exec";
+    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbyc6Op6HJ43V25y8__Ao9qMwWAMoADpstxpQ5NzW7EHSEgYCrNV0o6YkhpoJfFDc9yVcA/exec";
     let calendar = null;
     let currentUser = null;      // { account, name, title, isAdmin }
     let selectedLeaveType = 'full';
@@ -912,7 +912,7 @@
       else if (mode === 'seluser') {
         const u = getWheelValue('picker-ov-user');
         if (!u || u === '請選擇') { container.innerHTML = "<p class='text-muted text-center py-3 small'>請先滑動選擇人員</p>"; return; }
-        filtered = mockDb.filter(d => d.name === u); title = `<h6> ${u} 查詢結果：</h6>`;
+        filtered = mockDb.filter(d => d.name === u); title = `<h6> (${u}) 查詢結果：</h6>`;
       }
 
       if (filtered.length === 0) { container.innerHTML = title + "<p class='text-muted text-center py-3 small'>無請假紀錄</p>"; }
