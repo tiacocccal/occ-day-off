@@ -614,20 +614,32 @@
       d.setDate(d.getDate() + n);
       return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
     }
+    function isWeekend(dateStr) {
+      const d = new Date(dateStr + 'T00:00:00');
+      const day = d.getDay(); // 0=週日 6=週六
+      return day === 0 || day === 6;
+    }
+
     function buildFcEvents() {
       const events = [];
       mockDb.forEach(item => {
         let cur = item.startDate;
         const end = item.endDate || item.startDate;
+        const isMultiDay = item.startDate !== end;
         let guard = 0;
         while (cur <= end && guard < 366) {
-          events.push({
-            title: item.name,
-            start: cur,
-            end: addDaysToDateStr(cur, 1),
-            allDay: true,
-            classNames: ['occ-leave-label']
-          });
+          // 多天連續請假時，中間跨到的例假日（六、日）本來就不用請假，月曆上不顯示名字；
+          // 但如果是單獨只請六或日這一天（可能是補課日），還是要顯示。
+          const skip = isMultiDay && isWeekend(cur);
+          if (!skip) {
+            events.push({
+              title: item.name,
+              start: cur,
+              end: addDaysToDateStr(cur, 1),
+              allDay: true,
+              classNames: ['occ-leave-label']
+            });
+          }
           cur = addDaysToDateStr(cur, 1);
           guard++;
         }
