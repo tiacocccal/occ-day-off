@@ -50,7 +50,7 @@
 
     /* ===== Header / Footer ===== */
     #sticky-header-group { position: sticky; top: 0; z-index: 1000; }
-    .occ-navbar { font-family: 'Iansui'; background-color: var(--pantone-navy); color: white; padding: 14px 16px; padding-top: env(safe-area-inset-top, 14px); display: flex; justify-content: center; align-items: center; }
+    .occ-navbar { background-color: var(--pantone-navy); color: white; padding: 14px 16px; padding-top: env(safe-area-inset-top, 14px); display: flex; justify-content: center; align-items: center; }
     .navbar-brand-box { display: flex; align-items: center; gap: 8px; font-size: 20px; font-weight: bold; }
     .navbar-brand-box img { max-height: 28px; width: auto; object-fit: contain; }
     .status-bar { background-color: var(--pantone-navy); padding: 8px 16px 12px 16px; display: flex; align-items: center; justify-content: space-between; border-bottom: none; }
@@ -392,7 +392,7 @@
     })();
 
     // ===== 全域變數 =====
-    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbxk72FRcme5VpCsbzKI1GCBGHdBi5HtC9kKGPs028yGb1DsMA_uuggs_Ro9Xx-y83NOEw/exec";
+    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbzPSa6Y2nNe494rsCM3X34nG6EHG-iPOIuleVLkWzu4ftKTxEPk2zTPVaX4trCXH52-RQ/exec";
     let calendar = null;
     let currentUser = null;      // { account, name, title, isAdmin }
     let selectedLeaveType = 'full';
@@ -401,6 +401,8 @@
     let pickersInitialized = false;
     let mockDb = [];
     let userList = [];
+    let makeupDays = [];
+    let holidays = [];
     let editingLeaveId = null;
     let currentDayDetailDate = null;
 
@@ -409,9 +411,10 @@
       bindDateAutoClose();
       if (currentUser) {
         applyAdminUI();
-        await Promise.all([fetchUserList(), fetchAllLeaves()]);
+        await Promise.all([fetchUserList(), fetchAllLeaves(), fetchHolidaySettings()]);
         fillUserPicker();
         fillDelegateSelects();
+        if (calendar) calendar.refetchEvents();
       }
       try { initLazyPickers(); } catch (e) { console.error("選取器載入失敗", e); }
     });
@@ -502,6 +505,15 @@
       } catch (err) { console.error("員工名單載入失敗", err); }
     }
 
+    async function fetchHolidaySettings() {
+      try {
+        const res = await fetch(GOOGLE_SHEET_API + "?action=getHolidaySettings");
+        const data = await res.json();
+        makeupDays = data.makeupDays || [];
+        holidays = data.holidays || [];
+      } catch (err) { console.error("假日設定載入失敗", err); }
+    }
+
     async function fetchAllLeaves() {
       showLoading(true);
       try {
@@ -575,9 +587,10 @@
             currentUser = { account: data.account, name: data.name, title: data.title, isAdmin: data.title === "管理員" };
             localStorage.setItem('occ_user', JSON.stringify(currentUser));
             showMainApp();
-            await Promise.all([fetchUserList(), fetchAllLeaves()]);
+            await Promise.all([fetchUserList(), fetchAllLeaves(), fetchHolidaySettings()]);
             fillUserPicker();
             fillDelegateSelects();
+            if (calendar) calendar.refetchEvents();
           } else { alert(data.message || "登入失敗"); }
           showLoading(false);
         })
@@ -620,6 +633,16 @@
       return day === 0 || day === 6;
     }
 
+    // 判斷某一天是不是「需要正常上班（所以請假才要顯示）」的日子：
+    // 國定假日 -> 一律不算需要上班；
+    // 六、日 -> 除非有列在補課日清單，否則不算需要上班；
+    // 其餘平日 -> 算需要上班。
+    function isWorkRequiredDay(dateStr) {
+      if (holidays.includes(dateStr)) return false;
+      if (isWeekend(dateStr)) return makeupDays.includes(dateStr);
+      return true;
+    }
+
     function buildFcEvents() {
       const events = [];
       mockDb.forEach(item => {
@@ -628,9 +651,10 @@
         const isMultiDay = item.startDate !== end;
         let guard = 0;
         while (cur <= end && guard < 366) {
-          // 多天連續請假時，中間跨到的例假日（六、日）本來就不用請假，月曆上不顯示名字；
-          // 但如果是單獨只請六或日這一天（可能是補課日），還是要顯示。
-          const skip = isMultiDay && isWeekend(cur);
+          // 多天連續請假時，中間跨到不需要上班的日子（例假日／國定假日）就不顯示名字；
+          // 補課日雖然是六日但算要上班，會照樣顯示。
+          // 如果是特別單獨挑某一天請假，不管那天算不算上班日都照樣顯示。
+          const skip = isMultiDay && !isWorkRequiredDay(cur);
           if (!skip) {
             events.push({
               title: item.name,
@@ -930,7 +954,7 @@
       else if (mode === 'seluser') {
         const u = getWheelValue('picker-ov-user');
         if (!u || u === '請選擇') { container.innerHTML = "<p class='text-muted text-center py-3 small'>請先滑動選擇人員</p>"; return; }
-        filtered = mockDb.filter(d => d.name === u); title = `<h6> ${u} 查詢結果：</h6>`;
+        filtered = mockDb.filter(d => d.name === u); title = `<h6> (${u}) 查詢結果：</h6>`;
       }
 
       if (filtered.length === 0) { container.innerHTML = title + "<p class='text-muted text-center py-3 small'>無請假紀錄</p>"; }
