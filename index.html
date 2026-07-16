@@ -82,6 +82,9 @@
     .fc-daygrid-day { height: 95px !important; cursor: pointer; box-shadow: inset 0 1px 0 0 #e2e5e5; }
     .fc-daygrid-body tr:first-child .fc-daygrid-day { box-shadow: none !important; }
     .fc-daygrid-event.occ-leave-label { background-color: var(--occ-label-bg) !important; border: none !important; color: var(--occ-label-text) !important; font-size: 11px !important; font-weight: bold; text-align: center; padding: 3px 1px; margin: 1px 2px 0 2px; border-radius: 6px; }
+    .fc-daygrid-event.occ-holiday-label { background-color: #F6D6D6 !important; border: none !important; color: #A94A4A !important; font-size: 11px !important; font-weight: bold; text-align: center; padding: 3px 1px; margin: 1px 2px 0 2px; border-radius: 6px; }
+    .occ-holiday-label .fc-event-title, .occ-holiday-label .fc-event-main { color: #A94A4A !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .occ-holiday-label .fc-daygrid-event-dot { display: none; }
     .occ-leave-label .fc-event-title, .occ-leave-label .fc-event-main { color: var(--occ-label-text) !important; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .occ-leave-label .fc-daygrid-event-dot { display: none; }
 
@@ -392,7 +395,7 @@
     })();
 
     // ===== 全域變數 =====
-    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbzPSa6Y2nNe494rsCM3X34nG6EHG-iPOIuleVLkWzu4ftKTxEPk2zTPVaX4trCXH52-RQ/exec";
+    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbzxSPCbq2SA4nlgJGZdCdkv6UHraYrHgDilA1KRAxCwgxT3-6PijTWhJEL08vBS7ZuJtQ/exec";
     let calendar = null;
     let currentUser = null;      // { account, name, title, isAdmin }
     let selectedLeaveType = 'full';
@@ -638,7 +641,7 @@
     // 六、日 -> 除非有列在補課日清單，否則不算需要上班；
     // 其餘平日 -> 算需要上班。
     function isWorkRequiredDay(dateStr) {
-      if (holidays.includes(dateStr)) return false;
+      if (holidays.some(h => h.date === dateStr)) return false;
       if (isWeekend(dateStr)) return makeupDays.includes(dateStr);
       return true;
     }
@@ -667,6 +670,17 @@
           cur = addDaysToDateStr(cur, 1);
           guard++;
         }
+      });
+      // 國定假日名稱標籤（例如「中秋節」），顯示在對應日期的格子裡
+      holidays.forEach(h => {
+        if (!h.date || !h.name) return;
+        events.push({
+          title: h.name,
+          start: h.date,
+          end: addDaysToDateStr(h.date, 1),
+          allDay: true,
+          classNames: ['occ-holiday-label']
+        });
       });
       return events;
     }
