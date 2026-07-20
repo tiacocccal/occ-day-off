@@ -1,6 +1,6 @@
 {
-  "name": "OCC休假表",
-  "short_name": "OCC休假表",
+  "name": "偵一隊休假表",
+  "short_name": "偵一隊休假表",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#F0F7F7",
