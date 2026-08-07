@@ -371,7 +371,7 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales-all.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/zh-tw.global.min.js"></script>
   <script>
     // 清掉過去(Gemini時期)註冊過的舊 Service Worker 與快取，
     // 確保「加入主畫面」的捷徑一定會抓最新版本，不會被卡在舊版本裡出不來
@@ -395,7 +395,7 @@
     })();
 
     // ===== 全域變數 =====
-    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbzxSPCbq2SA4nlgJGZdCdkv6UHraYrHgDilA1KRAxCwgxT3-6PijTWhJEL08vBS7ZuJtQ/exec";
+    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbzcQ7s33wchhR8PJJa52dVMYUffacQeO6FWzcbEUmhoFv7jkyG5ovPF4V8xq9s8h_g9Rg/exec";
     let calendar = null;
     let currentUser = null;      // { account, name, title, isAdmin }
     let selectedLeaveType = 'full';
@@ -414,7 +414,7 @@
       bindDateAutoClose();
       if (currentUser) {
         applyAdminUI();
-        await Promise.all([fetchUserList(), fetchAllLeaves(), fetchHolidaySettings()]);
+        await fetchInitialData();
         fillUserPicker();
         fillDelegateSelects();
         if (calendar) calendar.refetchEvents();
@@ -517,6 +517,34 @@
       } catch (err) { console.error("假日設定載入失敗", err); }
     }
 
+    // 開啟 APP／登入時用這支：把員工名單、休假紀錄、假日設定一次跟後端要回來，
+    // 只跑一趟 GAS 往返（而不是三支各自獨立呼叫），是加快開啟速度的主要關鍵。
+    async function fetchInitialData() {
+      showLoading(true);
+      try {
+        const res = await fetch(GOOGLE_SHEET_API + "?action=getInitialData");
+        const data = await res.json();
+        userList = data.users || [];
+        const raw = data.leaves || [];
+        mockDb = (Array.isArray(raw) ? raw : []).map(item => ({
+          ...item,
+          startDate: cleanDateStr(item.startDate),
+          endDate: cleanDateStr(item.endDate || item.startDate),
+          start: cleanTimeStr(item.start),
+          end: cleanTimeStr(item.end)
+        }));
+        makeupDays = (data.holiday && data.holiday.makeupDays) || [];
+        holidays = (data.holiday && data.holiday.holidays) || [];
+        if (calendar) calendar.refetchEvents();
+        if (document.getElementById('sect-mytrips').classList.contains('active')) renderMyTrips();
+        if (document.getElementById('sect-overview').classList.contains('active')) renderOverviewList(currentActiveFilter);
+      } catch (err) {
+        console.error("初始資料載入失敗", err);
+      } finally {
+        showLoading(false);
+      }
+    }
+
     async function fetchAllLeaves() {
       showLoading(true);
       try {
@@ -550,7 +578,7 @@
       document.getElementById('user-greeting').innerText = currentUser ? currentUser.name : '同仁';
       applyAdminUI();
       setThemeColor('#4C6F94');
-      setTimeout(() => { if (typeof initCalendar === 'function') initCalendar(); }, 300);
+      requestAnimationFrame(() => { if (typeof initCalendar === 'function') initCalendar(); });
     }
 
     function togglePasswordVisibility() {
@@ -590,7 +618,7 @@
             currentUser = { account: data.account, name: data.name, title: data.title, isAdmin: data.title === "管理員" };
             localStorage.setItem('occ_user', JSON.stringify(currentUser));
             showMainApp();
-            await Promise.all([fetchUserList(), fetchAllLeaves(), fetchHolidaySettings()]);
+            await fetchInitialData();
             fillUserPicker();
             fillDelegateSelects();
             if (calendar) calendar.refetchEvents();
