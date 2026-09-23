@@ -6,11 +6,12 @@
   <title></title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.png">
-  <link rel="preload" href="icon.png" as="image" fetchpriority="high">
+  <link rel="preload" href="splash-logo.png" as="image" fetchpriority="high">
   <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="theme-color" content="#FFFFFF">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="theme-color" content="#ACD6E7">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -34,19 +35,20 @@
       font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
       margin: 0; padding-bottom: 85px; user-select: none;
     }
-    /* ===== APP 啟動畫面：先顯示本機 icon，避免啟動時只看到飛機等待 ===== */
+    /* ===== APP 啟動畫面：透明 OCC logo + CSS 全螢幕漸層；主畫面 icon 仍獨立使用 icon.png ===== */
     #app-splash {
       position: fixed; inset: 0; z-index: 20000;
       display: flex; align-items: center; justify-content: center;
       padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
-      background: linear-gradient(180deg, #ACD6E7 0%, #F7D9CB 55%, #F5BE9D 100%);
+      background: linear-gradient(180deg, #ACD6E7 0%, #D9E3E5 32%, #F6E6DD 56%, #F5C3A7 100%);
       opacity: 1; visibility: visible;
       transition: opacity .22s ease, visibility .22s ease;
     }
     #app-splash.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
     #app-splash img {
-      display: block; width: min(88vw, 460px); height: auto; max-height: 82dvh;
+      display: block; width: min(70vw, 380px); height: auto; max-height: 38dvh;
       object-fit: contain; object-position: center;
+      filter: drop-shadow(0 8px 10px rgba(76, 111, 148, 0.18));
     }
 
     /* ===== 登入畫面 ===== */
@@ -144,7 +146,7 @@
 </head>
 <body>
   <div id="app-splash" aria-hidden="true">
-    <img src="icon.png" alt="OCC">
+    <img src="splash-logo.png" alt="OCC">
   </div>
   <div id="loading-spinner" class="spinner-overlay" style="display:none;">
     <div class="plane-loader"><i class="fa-solid fa-plane"></i></div>
