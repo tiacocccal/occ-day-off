@@ -2,9 +2,10 @@
   "name": "OCC 休假表",
   "short_name": "OCC 休假表",
   "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#F0F7F7",
-  "theme_color": "#114B5F",
+  "background_color": "#ACD6E7",
+  "theme_color": "#C6D9E8",
   "icons": [
     {
       "src": "icon.png",
