@@ -6,6 +6,9 @@
   <title></title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.png">
+  <link rel="preload" href="icon.png" as="image" fetchpriority="high">
+  <link rel="preconnect" href="https://cdnjs.cloudflare.com" crossorigin>
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="theme-color" content="#FFFFFF">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
@@ -31,6 +34,21 @@
       font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
       margin: 0; padding-bottom: 85px; user-select: none;
     }
+    /* ===== APP 啟動畫面：先顯示本機 icon，避免啟動時只看到飛機等待 ===== */
+    #app-splash {
+      position: fixed; inset: 0; z-index: 20000;
+      display: flex; align-items: center; justify-content: center;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+      background: linear-gradient(180deg, #ACD6E7 0%, #F7D9CB 55%, #F5BE9D 100%);
+      opacity: 1; visibility: visible;
+      transition: opacity .22s ease, visibility .22s ease;
+    }
+    #app-splash.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
+    #app-splash img {
+      display: block; width: min(88vw, 460px); height: auto; max-height: 82dvh;
+      object-fit: contain; object-position: center;
+    }
+
     /* ===== 登入畫面 ===== */
     .login-page-bg {
       min-height: 100vh; min-height: 100dvh; display: flex; align-items: center; justify-content: center;
@@ -125,6 +143,9 @@
   </style>
 </head>
 <body>
+  <div id="app-splash" aria-hidden="true">
+    <img src="icon.png" alt="OCC">
+  </div>
   <div id="loading-spinner" class="spinner-overlay" style="display:none;">
     <div class="plane-loader"><i class="fa-solid fa-plane"></i></div>
   </div>
@@ -373,29 +394,17 @@
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/locales/zh-tw.global.min.js"></script>
   <script>
-    // 清掉過去(Gemini時期)註冊過的舊 Service Worker 與快取，
-    // 確保「加入主畫面」的捷徑一定會抓最新版本，不會被卡在舊版本裡出不來
-    (function cleanupOldServiceWorker() {
+    // 註冊 Service Worker：靜態資源會在背景快取，GAS 資料仍固定走網路取得最新內容。
+    window.addEventListener('load', function() {
       if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.getRegistrations().then(function(regs) {
-          if (regs.length > 0) {
-            regs.forEach(function(reg) { reg.unregister(); });
-            if (navigator.serviceWorker.controller && !sessionStorage.getItem('occ_sw_cleaned')) {
-              sessionStorage.setItem('occ_sw_cleaned', '1');
-              window.location.reload();
-            }
-          }
-        }).catch(function(){});
+        navigator.serviceWorker.register('./sw.js').catch(function(err) {
+          console.warn('Service Worker 註冊失敗', err);
+        });
       }
-      if (window.caches) {
-        caches.keys().then(function(names) {
-          names.forEach(function(name) { caches.delete(name); });
-        }).catch(function(){});
-      }
-    })();
+    });
 
     // ===== 全域變數 =====
-    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycbzcQ7s33wchhR8PJJa52dVMYUffacQeO6FWzcbEUmhoFv7jkyG5ovPF4V8xq9s8h_g9Rg/exec";
+    const GOOGLE_SHEET_API = "https://script.google.com/macros/s/AKfycby7mttmC3BGjYmF2KoThMfMxsU_E2dYx_lc_-ZSOynRPbVCCSZwgFUOVQPAdO25cUyCkg/exec";
     let calendar = null;
     let currentUser = null;      // { account, name, title, isAdmin }
     let selectedLeaveType = 'full';
@@ -412,14 +421,16 @@
     document.addEventListener("DOMContentLoaded", async function() {
       checkLoginState();
       bindDateAutoClose();
+
       if (currentUser) {
         applyAdminUI();
-        await fetchInitialData();
-        fillUserPicker();
+        // 啟動階段由 splash 遮罩呈現，不再顯示飛機動畫。
+        await fetchInitialData({ silent: true });
         fillDelegateSelects();
-        if (calendar) calendar.refetchEvents();
       }
-      try { initLazyPickers(); } catch (e) { console.error("選取器載入失敗", e); }
+
+      // 未登入時 DOM 準備好就直接顯示登入頁；已登入則等初始資料完成後再淡出。
+      requestAnimationFrame(hideAppSplash);
     });
 
     // ===== 小工具 =====
@@ -517,27 +528,47 @@
       } catch (err) { console.error("假日設定載入失敗", err); }
     }
 
-    // 開啟 APP／登入時用這支：把員工名單、休假紀錄、假日設定一次跟後端要回來，
-    // 只跑一趟 GAS 往返（而不是三支各自獨立呼叫），是加快開啟速度的主要關鍵。
-    async function fetchInitialData() {
-      showLoading(true);
+    function normalizeLeaves(raw) {
+      return (Array.isArray(raw) ? raw : []).map(item => ({
+        ...item,
+        startDate: cleanDateStr(item.startDate),
+        endDate: cleanDateStr(item.endDate || item.startDate),
+        start: cleanTimeStr(item.start),
+        end: cleanTimeStr(item.end)
+      }));
+    }
+
+    function refreshViewsAfterDataChange() {
+      if (calendar) calendar.refetchEvents();
+      if (document.getElementById('sect-mytrips').classList.contains('active')) renderMyTrips();
+      if (document.getElementById('sect-overview').classList.contains('active')) renderOverviewList(currentActiveFilter);
+    }
+
+    function applyInitialData(data) {
+      if (!data) return;
+      userList = data.users || [];
+      mockDb = normalizeLeaves(data.leaves || []);
+      makeupDays = (data.holiday && data.holiday.makeupDays) || [];
+      holidays = (data.holiday && data.holiday.holidays) || [];
+      fillDelegateSelects();
+      if (pickersInitialized) fillUserPicker();
+      refreshViewsAfterDataChange();
+    }
+
+    function applyLeaves(raw) {
+      mockDb = normalizeLeaves(raw || []);
+      refreshViewsAfterDataChange();
+    }
+
+    // 已登入重新開啟 APP 時：一次取得員工名單、休假紀錄與假日設定。
+    async function fetchInitialData(options = {}) {
+      const useOverlay = !options.silent;
+      if (useOverlay) showLoading(true);
       try {
         const res = await fetch(GOOGLE_SHEET_API + "?action=getInitialData");
         const data = await res.json();
-        userList = data.users || [];
-        const raw = data.leaves || [];
-        mockDb = (Array.isArray(raw) ? raw : []).map(item => ({
-          ...item,
-          startDate: cleanDateStr(item.startDate),
-          endDate: cleanDateStr(item.endDate || item.startDate),
-          start: cleanTimeStr(item.start),
-          end: cleanTimeStr(item.end)
-        }));
-        makeupDays = (data.holiday && data.holiday.makeupDays) || [];
-        holidays = (data.holiday && data.holiday.holidays) || [];
-        if (calendar) calendar.refetchEvents();
-        if (document.getElementById('sect-mytrips').classList.contains('active')) renderMyTrips();
-        if (document.getElementById('sect-overview').classList.contains('active')) renderOverviewList(currentActiveFilter);
+        if (data && data.status === 'error') throw new Error(data.message || '初始資料載入失敗');
+        applyInitialData(data);
       } catch (err) {
         console.error("初始資料載入失敗", err);
       } finally {
@@ -550,16 +581,8 @@
       try {
         const res = await fetch(GOOGLE_SHEET_API + "?action=getData");
         const raw = await res.json();
-        mockDb = (Array.isArray(raw) ? raw : []).map(item => ({
-          ...item,
-          startDate: cleanDateStr(item.startDate),
-          endDate: cleanDateStr(item.endDate || item.startDate),
-          start: cleanTimeStr(item.start),
-          end: cleanTimeStr(item.end)
-        }));
-        if (calendar) calendar.refetchEvents();
-        if (document.getElementById('sect-mytrips').classList.contains('active')) renderMyTrips();
-        if (document.getElementById('sect-overview').classList.contains('active')) renderOverviewList(currentActiveFilter);
+        if (raw && raw.status === 'error') throw new Error(raw.message || '資料載入失敗');
+        applyLeaves(raw);
       } catch (err) {
         console.error("資料載入失敗", err);
       } finally {
@@ -617,11 +640,8 @@
           if (data.status === "success") {
             currentUser = { account: data.account, name: data.name, title: data.title, isAdmin: data.title === "管理員" };
             localStorage.setItem('occ_user', JSON.stringify(currentUser));
+            if (data.initialData) applyInitialData(data.initialData);
             showMainApp();
-            await fetchInitialData();
-            fillUserPicker();
-            fillDelegateSelects();
-            if (calendar) calendar.refetchEvents();
           } else { alert(data.message || "登入失敗"); }
           showLoading(false);
         })
@@ -766,6 +786,9 @@
     function openQuickLeaveModalFromDay() { openQuickLeaveModal(currentDayDetailDate, null); }
 
     function openQuickLeaveModal(dateStr, existingEntry) {
+      if (!pickersInitialized) {
+        try { initLazyPickers(); } catch (e) { console.error('選取器載入失敗', e); }
+      }
       editingLeaveId = existingEntry ? existingEntry.id : null;
       const showDate = existingEntry ? existingEntry.startDate : dateStr;
       const qDateEl = document.getElementById('quick-date-display');
@@ -831,7 +854,8 @@
           if (data.status && data.status !== "success") { alert(data.message || "送出失敗"); return; }
           bootstrap.Modal.getInstance(document.getElementById('quickLeaveModal')).hide();
           editingLeaveId = null;
-          await fetchAllLeaves();
+          if (Array.isArray(data.leaves)) applyLeaves(data.leaves);
+          else await fetchAllLeaves(); // 舊版 GAS 相容備援
           alert("送出成功！");
         })
         .catch(err => { showLoading(false); console.error(err); alert("送出失敗，請稍後再試"); });
@@ -849,7 +873,8 @@
           if (data.status && data.status !== "success") { alert(data.message || "刪除失敗"); return; }
           const dayModalInst = bootstrap.Modal.getInstance(document.getElementById('dayDetailModal'));
           if (dayModalInst) dayModalInst.hide();
-          await fetchAllLeaves();
+          if (Array.isArray(data.leaves)) applyLeaves(data.leaves);
+          else await fetchAllLeaves(); // 舊版 GAS 相容備援
         })
         .catch(err => { showLoading(false); console.error(err); alert("刪除失敗，請稍後再試"); });
     }
@@ -901,8 +926,9 @@
           alert("送出成功！");
           const wasEditing = !!editingLeaveId;
           editingLeaveId = null;
+          if (Array.isArray(data.leaves)) applyLeaves(data.leaves);
+          else await fetchAllLeaves(); // 舊版 GAS 相容備援
           resetLeaveForm();
-          await fetchAllLeaves();
           if (wasEditing) switchTab('mytrips', null);
         })
         .catch(err => { showLoading(false); console.error(err); alert("送出失敗，請稍後再試"); });
@@ -1018,6 +1044,9 @@
 
     // ===== 分頁切換 =====
     function switchTab(id, btn) {
+      if ((id === 'reserve' || id === 'overview') && !pickersInitialized) {
+        try { initLazyPickers(); } catch (e) { console.error('選取器載入失敗', e); }
+      }
       document.querySelectorAll('.app-section').forEach(s => s.classList.remove('active'));
       document.querySelectorAll('.footer-item').forEach(b => b.classList.remove('active'));
       document.getElementById(`sect-${id}`).classList.add('active');
@@ -1146,6 +1175,13 @@
       Array.from(el.children).forEach(c => c.classList.remove('selected'));
       target.classList.add('selected');
       el.scrollTop = target.offsetTop - 36;
+    }
+
+    function hideAppSplash() {
+      const splash = document.getElementById('app-splash');
+      if (!splash || splash.classList.contains('is-hidden')) return;
+      splash.classList.add('is-hidden');
+      setTimeout(() => { splash.style.display = 'none'; }, 260);
     }
 
     function showLoading(show) { document.getElementById('loading-spinner').style.display = show ? 'flex' : 'none'; }
