@@ -1,9 +1,10 @@
-const CACHE_NAME = 'occ-app-v5-final';
+const CACHE_NAME = 'occ-app-v6-splash';
 const STATIC_ASSETS = [
   './',
   './index.html',
   './manifest.json',
   './icon.png',
+  './splash-logo.png',
   './logo.png'
 ];
 
