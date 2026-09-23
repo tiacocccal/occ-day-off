@@ -3,6 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <script>
+    // 既有 iPhone 主畫面 App 不需重裝：在 CSS 繪製前先標記 iOS standalone，
+    // 讓啟動畫面頂端直接銜接 iOS 可能保留的深藍狀態列。
+    (function () {
+      var ua = navigator.userAgent || '';
+      var isIOS = /iPhone|iPad|iPod/i.test(ua);
+      var isStandalone = window.navigator.standalone === true ||
+        (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+      if (isIOS && isStandalone) document.documentElement.classList.add('ios-standalone');
+    })();
+  </script>
   <title></title>
   <link rel="manifest" href="manifest.json">
   <link rel="apple-touch-icon" href="icon.png">
@@ -11,7 +22,7 @@
   <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="theme-color" content="#ACD6E7">
+  <meta name="theme-color" content="#4C6F94">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.0/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -30,6 +41,7 @@
       --brand-gradient: linear-gradient(90deg, #A9C4DA 0%, #6B8FA0 100%);
     }
     html, body { min-height: 100%; }
+    html { background: #ACD6E7; }
     body {
       background-color: var(--pantone-light-bg);
       font-family: "PingFang TC", "Heiti TC", "Microsoft JhengHei", sans-serif;
@@ -44,6 +56,30 @@
       opacity: 1; visibility: visible;
       transition: opacity .22s ease, visibility .22s ease;
     }
+    /*
+      iOS 已加入主畫面的既有 App：某些版本會保留一段系統狀態列底色，
+      而且舊安裝不一定會立即採用更新後的 theme-color。
+      這裡不強迫同仁重裝，而是讓 splash 從相同深藍開始，再柔順過渡到原本淡藍，
+      因此即使系統區塊仍存在，也不會出現明顯的水平接縫。
+    */
+    .ios-standalone #app-splash {
+      background: linear-gradient(180deg,
+        #4C6F94 0%,
+        #4C6F94 5.5%,
+        #6E90AE 9%,
+        #91B5CE 13%,
+        #ACD6E7 18%,
+        #C8DDE6 31%,
+        #E7E4DF 48%,
+        #F6D7C6 67%,
+        #F5C3A7 100%
+      );
+    }
+    .ios-standalone,
+    .ios-standalone body {
+      background-color: #4C6F94;
+    }
+
     #app-splash.is-hidden { opacity: 0; visibility: hidden; pointer-events: none; }
     #app-splash img {
       display: block; width: min(70vw, 380px); height: auto; max-height: 38dvh;
@@ -594,7 +630,14 @@
 
     function setThemeColor(color) {
       const meta = document.querySelector('meta[name="theme-color"]');
-      if (meta) meta.setAttribute('content', color);
+      if (!meta) return;
+      // iOS 加入主畫面的 PWA：固定狀態列底色為啟動畫面頂端色，
+      // 避免主程式切換成深藍 theme-color 後，下次開啟出現一整條深藍色塊。
+      const isIOSStandalone = /iPhone|iPad|iPod/i.test(navigator.userAgent) &&
+        (window.navigator.standalone === true || window.matchMedia('(display-mode: standalone)').matches);
+      // 既有 iOS Home Screen App 可能已記住深藍狀態列；維持深藍並由 splash 自然銜接，
+      // 比要求所有同仁刪除重裝更穩定。
+      meta.setAttribute('content', isIOSStandalone ? '#4C6F94' : color);
     }
 
     function showMainApp() {
