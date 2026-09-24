@@ -1,4 +1,4 @@
-const CACHE_NAME = 'occ-app-v8-ios-seamless';
+const CACHE_NAME = 'occ-app-v6-splash';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -23,8 +23,6 @@ self.addEventListener('activate', event => {
     caches.keys()
       .then(names => Promise.all(names.filter(name => name !== CACHE_NAME).map(name => caches.delete(name))))
       .then(() => self.clients.claim())
-      .then(() => self.clients.matchAll({ type: 'window', includeUncontrolled: true }))
-      .then(clients => clients.forEach(client => client.postMessage({ type: 'OCC_SW_UPDATED', version: CACHE_NAME })))
   );
 });
 
